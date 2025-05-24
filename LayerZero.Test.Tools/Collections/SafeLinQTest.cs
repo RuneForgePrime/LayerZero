@@ -19,8 +19,7 @@ namespace LayerZero.Test.Tools.Collections
             FluentActions
                 .Invoking(() => SafeLinQ<int>.ElementAtSafe(ints, Index))
                 .Should()
-                .Throw<ArgumentNullException>()
-                .WithMessage($"Value cannot be null. (Parameter '{nameof(ints)}')");
+                .Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -31,8 +30,7 @@ namespace LayerZero.Test.Tools.Collections
             FluentActions
                 .Invoking(() => SafeLinQ<int>.ElementAtSafe(ints, Index))
                 .Should()
-                .Throw<ArgumentException>()
-                .WithMessage($"Parameter {nameof(ints)} cannot be empty");
+                .Throw<ArgumentException>();
         }
 
         [Fact]

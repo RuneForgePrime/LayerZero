@@ -2,10 +2,13 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using LayerZero.Benchmark.Tools.Collections;
+using LayerZero.Benchmark.Tools.CoreClasses;
 
 BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
 
 BenchmarkRunner.Run<SafeLinqBenchmark>();
+BenchmarkRunner.Run<SygilParserBenchmark>();
 
 
-Console.WriteLine("Hello, World!");
+
+Console.ReadKey();

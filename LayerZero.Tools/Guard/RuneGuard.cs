@@ -13,7 +13,7 @@ namespace LayerZero.Tools.Guard
     public static class RuneGuard
     {
         public static T NotNull<T>(this T? obj,
-                                   [CallerArgumentExpression("source")] string sourceExpression = "")
+                                   [CallerArgumentExpression("obj")] string sourceExpression = "")
         {
             if (obj is null)
                 throw new ArgumentNullException(sourceExpression);
@@ -22,7 +22,7 @@ namespace LayerZero.Tools.Guard
         }
 
         public static T[] NotEmpty<T>(this T[] array,
-                                   [CallerArgumentExpression("source")] string sourceExpression = "")
+                                   [CallerArgumentExpression("array")] string sourceExpression = "")
         {
             if (array.Length == 0)
                 throw new ArgumentException($"{sourceExpression} cannot be empty.");
