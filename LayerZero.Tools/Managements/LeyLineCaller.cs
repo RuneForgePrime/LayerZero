@@ -39,7 +39,7 @@ namespace LayerZero.Tools.Managements
             => GeasMaster.RunSync<HttpResponseMessage>(() => _PostAsync(uri, Object));
 
 
-        private async Task<object> ParseResponse<T>(HttpResponseMessage message)
+        private async Task<object?> ParseResponse<T>(HttpResponseMessage message)
         {
             var contentType = message.Content.Headers.ContentType?.MediaType?.ToLowerInvariant() ?? "";
             var hasFileName = message.Content.Headers.ContentDisposition?.FileName is not null;
