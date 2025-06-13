@@ -1,5 +1,6 @@
 ---
 name: 💡 Feature Request
+Package: "[Package name]"
 about: Suggest an enhancement for the package
 title: "[Feature] "
 labels: enhancement

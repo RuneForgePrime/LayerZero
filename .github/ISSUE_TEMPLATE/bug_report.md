@@ -1,5 +1,6 @@
 ---
 name: 🐛 Bug Report
+Package: "[Package name]"
 about: Something not working as expected?
 title: "[Bug] "
 labels: bug
