@@ -4,6 +4,21 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- NuGet Metadata -->
+    <AssemblyName>LayerZero.Tools</AssemblyName>
+    <PackageId>LayerZero.Tools</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>RuneForgePrime</Authors>
+    <Company>LayerZero</Company>
+    <Description>Foundational .NET utilities with minimal dependencies — includes type parsing, safe LINQ, sync task execution, and HTTP helpers.</Description>
+    <PackageTags>dotnet utilities async parsing linq http layerzero tools</PackageTags>
+    <RepositoryUrl>https://github.com/RuneForgePrime/LayerZero</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/RuneForgePrime/LayerZero</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>

@@ -81,17 +81,184 @@ for developers who want clarity, predictability, and fallback options by design.
 
 ---
 
-## 🧾 License
+> “The shape of a system begins with the clarity of a single stroke.”
+
+## 🧰 SafeLinQ
+
+**SafeLinQ** provides defensive, expressive alternatives to common LINQ operations in .NET, guarding against nulls, empty sources, and missing elements.
+
+Part of the `LayerZero.Tools` suite — built for resilience and clarity in everyday collection usage.
+
+---
+
+
+### 📦 Installation
+
+Planned NuGet package:
+
+```bash
+dotnet add package LayerZero.Tools
+```
+---
+
+
+### 🔍 Features
+
+- `ElementAtSafe()` with index bounds validation
+- `ToDictionarySafe()` with optional overwrite
+- `DistinctSafe()` with optional custom comparer
+- `FallbackIfEmpty()` for graceful default population
+
+Built to prevent:
+
+- `ArgumentNullException`
+- `IndexOutOfRangeException`
+- Silent LINQ misbehavior (e.g., `.First()` on empty sources)
+
+---
+
+### 🧪 Example
+
+```csharp
+using LayerZero.Tools.Linq;
+
+var list = new[] { "alpha", "beta", "gamma" };
+
+list.ElementAtSafe(1);                     // "beta"
+list.ElementAtSafe(10);                    // null (safe fallback)
+
+list.ToDictionarySafe(x => x.Length, false);
+// { 5: "alpha", 4: "beta" } — keeps first occurrence
+
+list.DistinctSafe();                       // distinct items
+list.FallbackIfEmpty(() => "default");    // yields "default" if empty
+```
+
+---
+
+
+### ⚔️ Why SafeLinQ Exists
+
+In standard LINQ, silent failures and non-obvious exceptions are common:
+
+```csharp
+source.First();        // throws on empty
+source.ElementAt(99);  // throws on out-of-range
+source.ToDictionary(); // throws on duplicate keys
+```
+
+**SafeLinQ** addresses these issues by:
+
+- Adding precondition checks
+- Allowing graceful degradation
+- Preserving caller intent
+
+---
+## ⚙️ GeasMaster
+
+**GeasMaster** is a synchronous execution harness for asynchronous .NET tasks. Useful when async code must run in blocking contexts — safely, consistently, and without `ConfigureAwait` chaos.
+
+Part of the `LayerZero.Tools` suite — focused on deterministic control and guard-backed execution.
+
+---
+
+### 🔍 Features
+
+- `RunSync<T>()` to execute async functions synchronously and retrieve result
+- Overloads for both `Func<Task<T>>` and `Func<CancellationToken, Task<T>>`
+- Includes void-returning task support
+- Based on `TaskFactory` to avoid deadlocks in UI or legacy contexts
+
+---
+
+### 🧪 Example
+
+```csharp
+using LayerZero.Tools.Runtime;
+
+var result = GeasMaster.RunSync(() => MyAsyncMethod());
+
+GeasMaster.RunSync(async ct =>
+{
+    await DoSomethingAsync(ct);
+});
+```
+
+---
+
+### ⚔️ Why GeasMaster Exists
+
+Async/await is ideal — but legacy codebases, ASP.NET constructors, or sync APIs occasionally require a deterministic, blocking call.
+
+**GeasMaster** gives you this capability safely:
+
+- No deadlocks from `Result` or `.Wait()`
+- Controlled sync execution via `TaskFactory`
+- Minimal ceremony, full control
+
+---
+
+> “A task without form is a thread unbound.”
+
+
+---
+
+
+## 🌐 LeyLineCaller
+
+**LeyLineCaller** is a minimalistic HTTP client wrapper with optional authentication headers, built-in sync/async handling, and typed parsing — ideal for internal APIs or automation tools.
+
+---
+
+### 🔍 Features
+
+- Built-in support for `GET` and `POST` requests
+- Sync and async execution support (via `GeasMaster`)
+- Optional authentication via `SigilBinder`
+- Smart response parsing with support for:
+  - JSON (via `SygilParser`)
+  - Binary streams (as `EchoShard`)
+  - Text/plain and fallback formats
+
+---
+
+### 🧪 Example
+
+```csharp
+var caller = new LeyLineCaller(myTokenBinder);
+
+var result = caller.Get<MyDto>("https://api.myapp.com/data");
+
+await caller.PostAsync<MyResponse>("/submit", new { id = 42 });
+```
+
+
+### ⚔️ Why LeyLineCaller Exists
+
+- HttpClient is powerful but verbose
+- Most HTTP wrappers are overkill or opinionated
+- Sync scenarios are needed in CLI tools or scripting environments
+
+**LeyLineCaller** balances minimalism and power:
+
+- Transparent async/sync bridging
+- Typed deserialization with safety
+- Built for internal systems where speed matters
+
+---
+
+### 💾 License
 
 MIT
 
 ---
 
-## 🔨 Author
+### 🔨 Author
 
 Crafted by **[RuneForgePrime]**  
 Part of the `LayerZero.Tools` initiative.
 
 ---
 
-> “The shape of a system begins with the clarity of a single stroke.”
+> “The line is open. Let the ley energies flow.”
+
