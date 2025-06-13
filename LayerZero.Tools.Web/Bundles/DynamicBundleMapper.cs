@@ -1,4 +1,5 @@
-﻿using LayerZero.Tools.Web.Services.Bundles;
+﻿using LayerZero.Tools.Guard;
+using LayerZero.Tools.Web.Services.Bundles;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -32,11 +33,15 @@ namespace LayerZero.Tools.Web.Bundles
                 }
                 else if (nodes.Count == 1)
                 {
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.TopDirectoryOnly, ["*.js"]))
+                        continue;
                     _bundles.RegisterJsBundle(nodes[0]);
                     pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js").MinifyJavaScript();
                 }
                 else
                 {
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.AllDirectories, ["*.css"]))
+                        continue;
                     _bundles.RegisterJsBundle(nodes[0], nodes[1]);
                     pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js").MinifyJavaScript();
                 }
@@ -58,11 +63,17 @@ namespace LayerZero.Tools.Web.Bundles
                 }
                 else if (nodes.Count == 1)
                 {
-                    _bundles.RegisterCssBundle(nodes[0]);
+
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.TopDirectoryOnly, ["*.css"]))
+                        continue;
+
+                        _bundles.RegisterCssBundle(nodes[0]);
                     pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css").MinifyCss();
                 }
                 else
                 {
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.AllDirectories, ["*.css"]))
+                        continue;
                     _bundles.RegisterCssBundle(nodes[0], nodes[1]);
                     pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
                 }
