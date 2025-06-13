@@ -1,4 +1,5 @@
-﻿using LayerZero.Tools.Web.Services.Bundles;
+﻿using LayerZero.Tools.Guard;
+using LayerZero.Tools.Web.Services.Bundles;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,10 @@ namespace LayerZero.Tools.Web.Bundles
     {
         public static BundleCollection _bundles { get; } = new();
 
-        public static void Register(IAssetPipeline pipeline, string JsRoot = "js/controller", string CssRoot = "css/controller")
+        public static void Register(IAssetPipeline pipeline, 
+            string JsRoot = "js/controller", 
+            string CssRoot = "css/controller",
+            bool isDevelopment = false)
         {
             var rootDirectory = @"wwwroot/";
 
@@ -32,13 +36,25 @@ namespace LayerZero.Tools.Web.Bundles
                 }
                 else if (nodes.Count == 1)
                 {
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.TopDirectoryOnly, [".js"]))
+                        continue;
                     _bundles.RegisterJsBundle(nodes[0]);
-                    pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js").MinifyJavaScript();
+
+                    if(isDevelopment)
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js");
+                    else
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js").MinifyJavaScript();
                 }
                 else
                 {
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.AllDirectories, [".js"]))
+                        continue;
+
                     _bundles.RegisterJsBundle(nodes[0], nodes[1]);
-                    pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js").MinifyJavaScript();
+                    if (isDevelopment)
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js");
+                    else
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js").MinifyJavaScript();
                 }
             }
 
@@ -58,13 +74,27 @@ namespace LayerZero.Tools.Web.Bundles
                 }
                 else if (nodes.Count == 1)
                 {
+
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.TopDirectoryOnly, [".css"]))
+                        continue;
+
                     _bundles.RegisterCssBundle(nodes[0]);
-                    pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css").MinifyCss();
+
+                    if (isDevelopment)
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css");
+                    else
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css").MinifyCss();
                 }
                 else
                 {
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.AllDirectories, [".css"]))
+                        continue;
                     _bundles.RegisterCssBundle(nodes[0], nodes[1]);
-                    pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
+
+                    if (isDevelopment)
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css");
+                    else
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
                 }
             }
         }
