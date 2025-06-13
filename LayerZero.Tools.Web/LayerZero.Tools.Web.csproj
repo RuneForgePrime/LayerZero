@@ -18,4 +18,8 @@
     <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.436" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LayerZero.Tools\LayerZero.Tools.csproj" />
+  </ItemGroup>
+
 </Project>
