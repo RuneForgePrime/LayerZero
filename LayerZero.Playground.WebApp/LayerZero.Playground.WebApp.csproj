@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LayerZero.Tools.Web" Version="1.0.0" />
+    <Folder Include="wwwroot\css\Controller\Home\Index\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LayerZero.Tools.Web\LayerZero.Tools.Web.csproj" />
   </ItemGroup>
 
 </Project>
