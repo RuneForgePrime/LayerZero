@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LayerZero.Tools" Version="1.0.1" />
-    <PackageReference Include="LayerZero.Tools.Web" Version="1.0.1" />
+    <ProjectReference Include="..\LayerZero.Tools.Web\LayerZero.Tools.Web.csproj" />
   </ItemGroup>
 
 </Project>
