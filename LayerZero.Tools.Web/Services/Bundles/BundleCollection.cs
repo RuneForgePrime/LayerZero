@@ -11,7 +11,9 @@ namespace LayerZero.Tools.Web.Services.Bundles
         private readonly HashSet<string> _bundlesCss = new (StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _bundlesJs = new (StringComparer.OrdinalIgnoreCase);
 
+
         private string _criticalCss = string.Empty;
+        private bool _isDev = false;
 
         public void RegisterJsBundle(string Controller, string? Action = null)
         {
@@ -47,5 +49,12 @@ namespace LayerZero.Tools.Web.Services.Bundles
 
         public string GetCriticalCss() => this._criticalCss;
 
+        public void SetEnv(bool IsDevelopment)
+        {
+            this._isDev = IsDevelopment;
+        }
+
+
+        public bool IsDev() => this._isDev;
     }
 }

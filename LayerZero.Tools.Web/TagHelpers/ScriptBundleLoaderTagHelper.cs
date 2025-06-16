@@ -34,13 +34,15 @@ namespace LayerZero.Tools.Web.TagHelpers
             if (controller == null) return;
 
             string html = string.Empty;
-            var guid = Guid.NewGuid().ToString();
+            var cacheBusting = string.Empty;
+            if (_bundleRegistry.IsDev())
+                cacheBusting = $"?v={Guid.NewGuid().ToString()}";
 
             if (_bundleRegistry.IsJsBundleRegistered(controller))
-                html += $"<script src=\"/bundles/{controller}.min.js?v={guid}\"></script>";
+                html += $"<script src=\"/bundles/{controller}.min.js{cacheBusting}\"></script>";
 
             if (_bundleRegistry.IsJsBundleRegistered(controller, action))
-                html += $"<script src=\"/bundles/{controller}/{action}.min.js?v={guid}\"></script>";
+                html += $"<script src=\"/bundles/{controller}/{action}.min.js{cacheBusting}\"></script>";
 
             if (!string.IsNullOrEmpty(html))
             {

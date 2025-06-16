@@ -34,14 +34,16 @@ namespace LayerZero.Tools.Web.TagHelpers
             if (controller == null) return;
 
             string html = string.Empty;
-            var guid = Guid.NewGuid().ToString();
+            var cacheBusting = string.Empty;
+            if(_bundleRegistry.IsDev())
+                cacheBusting = $"?v={Guid.NewGuid().ToString()}";
 
 
             if (_bundleRegistry.IsCssBundleRegistered(controller))
-                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}.min.css?v={guid}\" />";
+                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}.min.css{cacheBusting}\" />";
 
             if (_bundleRegistry.IsCssBundleRegistered(controller, action))
-                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}/{action}.min.css?v={guid}\" />";
+                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}/{action}.min.css{cacheBusting}\" />";
 
             if (!string.IsNullOrEmpty(html))
             {
