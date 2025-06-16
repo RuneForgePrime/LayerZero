@@ -34,12 +34,13 @@ namespace LayerZero.Tools.Web.TagHelpers
             if (controller == null) return;
 
             string html = string.Empty;
+            var guid = Guid.NewGuid().ToString();
 
             if (_bundleRegistry.IsJsBundleRegistered(controller))
-                html += $"<script src=\"/bundles/{controller}.min.js\"></script>";
+                html += $"<script src=\"/bundles/{controller}.min.js?v={guid}\"></script>";
 
             if (_bundleRegistry.IsJsBundleRegistered(controller, action))
-                html += $"<script src=\"/bundles/{controller}/{action}.min.js\"></script>";
+                html += $"<script src=\"/bundles/{controller}/{action}.min.js?v={guid}\"></script>";
 
             if (!string.IsNullOrEmpty(html))
             {
