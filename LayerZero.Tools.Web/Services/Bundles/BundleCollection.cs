@@ -11,6 +11,8 @@ namespace LayerZero.Tools.Web.Services.Bundles
         private readonly HashSet<string> _bundlesCss = new (StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _bundlesJs = new (StringComparer.OrdinalIgnoreCase);
 
+        private string _criticalCss = string.Empty;
+
         public void RegisterJsBundle(string Controller, string? Action = null)
         {
             var path = !string.IsNullOrEmpty(Action) ? $"{Controller}/{Action}" : Controller;
@@ -36,6 +38,14 @@ namespace LayerZero.Tools.Web.Services.Bundles
             var path = !string.IsNullOrEmpty(Action) ? $"{Controller}/{Action}" : Controller;
             return this._bundlesCss.Contains(path);
         }
+
+
+        public void SetCriticalCss(string Rules)
+        {
+            this._criticalCss = Rules;
+        }
+
+        public string GetCriticalCss() => this._criticalCss;
 
     }
 }

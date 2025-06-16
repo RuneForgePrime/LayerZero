@@ -19,6 +19,13 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageIcon>Icon/logo.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Icon/logo.png" Pack="true" PackagePath="Icon/">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

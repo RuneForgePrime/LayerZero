@@ -27,12 +27,13 @@ namespace LayerZero.Tools.Guard
             if (!Exists(DirectoryPath))
                 throw new ArgumentException($"Provided path {sourceExpression} does not exists");
 
+            var files = Directory.EnumerateFiles(DirectoryPath, "*.*", SearchOption);
+
             if (FileExtensions == null || FileExtensions.Length == 0)
-                return !Directory.EnumerateFiles(DirectoryPath, "*.*", SearchOption).Any();
+                return !files.Any();
 
 
-            return !Directory.EnumerateFiles(DirectoryPath, "*.*", SearchOption)
-            .Any(file => FileExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase));
+            return !files.Any(file => FileExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase));
 
         }
     }

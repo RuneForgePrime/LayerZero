@@ -19,15 +19,30 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageIcon>Icon/logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AngleSharp.Css" Version="0.17.0" />
     <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.436" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LayerZero.Tools\LayerZero.Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Icon/logo.png" Pack="true" PackagePath="Icon/">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="README.md" Pack="true" PackagePath="">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="CHANGELOG.md" Pack="true" PackagePath="">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

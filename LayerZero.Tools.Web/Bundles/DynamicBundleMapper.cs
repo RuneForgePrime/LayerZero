@@ -1,4 +1,6 @@
 ﻿using LayerZero.Tools.Guard;
+using LayerZero.Tools.IO;
+using LayerZero.Tools.Web.Parser;
 using LayerZero.Tools.Web.Services.Bundles;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,6 +19,7 @@ namespace LayerZero.Tools.Web.Bundles
         public static void Register(IAssetPipeline pipeline, 
             string JsRoot = "js/controller", 
             string CssRoot = "css/controller",
+            string CriticalCssRoot = "css/critical",
             bool isDevelopment = false)
         {
             var rootDirectory = @"wwwroot/";
@@ -97,6 +100,21 @@ namespace LayerZero.Tools.Web.Bundles
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
                 }
             }
+
+            var rootFolderCssCritical = $@"{rootDirectory}{CriticalCssRoot}";
+
+            var cssCriticalFiles = SpindleTree.GetAllFilesPath(rootFolderCssCritical, FileExtensions: [".css"]);
+
+            var criticalCss = new StringBuilder();
+            cssCriticalFiles.ForEach(f =>
+            {
+                var rules = CssFileParser.Analyse(f);
+                criticalCss.AppendLine(rules);
+            });
+
+            if(!string.IsNullOrEmpty(criticalCss.ToString()))
+                _bundles.SetCriticalCss(criticalCss.ToString());
+
         }
     }
 }
