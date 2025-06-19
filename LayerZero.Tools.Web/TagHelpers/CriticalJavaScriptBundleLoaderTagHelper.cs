@@ -11,15 +11,12 @@ using System.Threading.Tasks;
 namespace LayerZero.Tools.Web.TagHelpers
 {
 
-    [HtmlTargetElement("critical-style-bundle-loader")]
-    public class CriticalStyleBundleLoaderTagHelper : TagHelper
+    [HtmlTargetElement("critical-script-bundle-loader")]
+    public class CriticalJavaScriptBundleLoaderTagHelper : TagHelper
     {
         private readonly BundleCollection _bundleRegistry;
 
-        public CriticalStyleBundleLoaderTagHelper(BundleCollection bundleRegistry)
-        {
-            _bundleRegistry = bundleRegistry;
-        }
+        public CriticalJavaScriptBundleLoaderTagHelper(BundleCollection bundleRegistry) => _bundleRegistry = bundleRegistry;
 
         [ViewContext]
         [HtmlAttributeNotBound]
@@ -28,9 +25,9 @@ namespace LayerZero.Tools.Web.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = null;
-            var js = this._bundleRegistry.GetCriticalJs();
-            if (!string.IsNullOrEmpty(js))
-                output.Content.SetHtmlContent(@$"<!-- Critical JS Start --><script>{js}</script><!-- Critical Js End -->");
+            var css = this._bundleRegistry.GetCriticalCss();
+            if (!string.IsNullOrEmpty(css))
+                output.Content.SetHtmlContent(@$"<!-- Critical CSS Start --><style>{css}</style><!-- Critical CSS End -->");
             else
                 output.SuppressOutput();
         }
