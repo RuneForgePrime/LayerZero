@@ -1,0 +1,95 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    filter: url(#goo);
+    overflow: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body, .container, .blob {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    gap: 8vh;
+    animation: 3s container-animation infinite 1s;
+    padding: 2rem;
+}
+
+.blob {
+    aspect-ratio: 1 / 1;
+    height: 30vh;
+    border-radius: 15vh;
+    background: #eee;
+    animation: 3s blob-animation infinite 1s;
+}
+
+    .blob:nth-child(1) {
+        --offset: -30vh;
+    }
+
+    .blob:nth-child(2) {
+        --offset: 30vh;
+    }
+
+@keyframes container-animation {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    30% {
+        transform: scale(2, 0.5);
+    }
+
+    42% {
+        transform: scale(.25, 2);
+    }
+
+    50% {
+        transform: scale(1.25, .8) rotateZ(60deg);
+    }
+
+    60% {
+        transform: scale(0.9, 1.2) rotateZ(90deg);
+    }
+
+    67% {
+        transform: scale(1.1, 0.9) rotateZ(100deg);
+    }
+
+    75% {
+        transform: scale(0.95, 1.05) rotateZ(90deg);
+    }
+
+    80% {
+        transform: scale(1.05, 0.98) rotateZ(45deg);
+    }
+
+    95% {
+        transform: scale(1, 1) rotateZ(0deg);
+    }
+}
+
+@keyframes blob-animation {
+    30% {
+        transform: translateX(var(--offset));
+    }
+
+    42% {
+        transform: translateX(calc(var(--offset) * -0.7));
+    }
+
+    80% {
+        transform: translateX(calc(var(--offset) * -0.6));
+    }
+}
