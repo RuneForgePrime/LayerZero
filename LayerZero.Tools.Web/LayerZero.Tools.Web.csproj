@@ -7,7 +7,7 @@
     <!-- NuGet Metadata -->
     <AssemblyName>LayerZero.Tools.Web</AssemblyName>
     <PackageId>LayerZero.Tools.Web</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Authors>RuneForgePrime</Authors>
     <Company>LayerZero</Company>
     <Description>Convention-based dynamic JS/CSS bundling and injection system for ASP.NET Core using WebOptimizer.</Description>
