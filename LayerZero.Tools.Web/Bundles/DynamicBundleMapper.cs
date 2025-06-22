@@ -22,6 +22,8 @@ namespace LayerZero.Tools.Web.Bundles
             string CriticalCssRoot = "css/critical",
             bool isDevelopment = false)
         {
+            _bundles.SetEnv(isDevelopment);
+
             var rootDirectory = @"wwwroot/";
 
             var rootFolderJs = @$"{rootDirectory}{JsRoot}";

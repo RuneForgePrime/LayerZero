@@ -11,3 +11,7 @@ html {
 body {
     margin-bottom: 60px;
 }
+
+body, html{
+    color: #fff;
+}

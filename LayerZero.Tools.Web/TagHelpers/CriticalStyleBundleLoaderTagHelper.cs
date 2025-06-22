@@ -30,7 +30,7 @@ namespace LayerZero.Tools.Web.TagHelpers
             output.TagName = null;
             var css = this._bundleRegistry.GetCriticalCss();
             if (!string.IsNullOrEmpty(css))
-                output.Content.SetHtmlContent(@$"<!-- Critical CSS Start --><style>{css}</style><!-- Critical CSS End -->");
+                output.Content.SetHtmlContent(@$"<!-- Injected Critical CSS Start --><style>{css}</style><!-- Injected Critical CSS End -->");
             else
                 output.SuppressOutput();
         }
