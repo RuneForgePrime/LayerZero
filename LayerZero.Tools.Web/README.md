@@ -155,7 +155,7 @@ Minification is automatically applied **only in production**. When `isDevelopmen
 To prevent browser caching during local testing, development mode appends `?v=<random>` to asset URLs.
 
 ```html
-<link rel="stylesheet" href="/bundles/home.min.css?v=202406160915" />
+<link rel="stylesheet" href="/bundles/home.min.css?v=46174bc4-f61a-4382-a733-81ffe8c73074" />
 ```
 
 In production, clean URLs are used for optimal caching.
