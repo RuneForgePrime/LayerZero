@@ -112,6 +112,7 @@ app.UseWebOptimizer();
 
 ```cshtml
 <head>
+    <critical-style-bundle-loader/>
     <style-bundle-loader />
 </head>
 <body>
