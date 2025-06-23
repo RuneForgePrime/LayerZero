@@ -14,23 +14,42 @@ Eliminates manual asset management in Razor views by scanning controller/action 
 
 ```
 wwwroot/
-├── js/
-│   └── controllers/
-│       ├── Home/
-│       │   ├── index.js
-│       │   └── details.js
-│       └── Dashboard/
-│           └── overview.js
-└── css/
-    └── controllers/
-        ├── Home/
-        │   ├── index.css
-        │   └── shared.css
-        └── Dashboard/
-            └── overview.css
++---css
+|   |   site.css
+|   |   
+|   +---Controller
+|   |   \---Home
+|   |       |   Home.css
+|   |       |   
+|   |       +---Index
+|   |       |       StyleSheet.css
+|   |       |       
+|   |       \---Privacy
+|   |               StyleSheet.css
+|   |               
+|   \---critical
+|           StyleSheet-cr1.css
+|           StyleSheet-cr2.css
+|           
++---js
+|   |   site.js
+|   |   
+|   \---Controller
+|       \---Home
+|           |   Script.js
+|           |   
+|           +---Index
+|           |       Script.js
+|           |       
+|           \---Privacy
+|                   flickity.pkgd.min.js
+|                   JavaScript.js
+|                   
+\---lib
 ```
 
-`Controller/Action` structure drives bundle discovery.
+`Controller/Action` structure drives bundle discovery. nd a special folder for `critical CSS`
+
 
 ---
 
@@ -63,29 +82,21 @@ dotnet add reference ../DynamicBundleLoader/DynamicBundleLoader.csproj
 ### Register in `Program.cs`
 
 ```csharp
-builder.Services.AddSingleton(DynamicBundleMapper.Bundles);
-builder.Services.AddWebOptimizer(pipeline =>
-{
-    DynamicBundleMapper.Register(pipeline, isDevelopment: app.Environment.IsDevelopment());
-});
+builder.Services.AddDynamicBundle();
 ```
+
+Or if you want to enable cache-busting on dev environment:
+
+```csharp
+builder.Services.AddDynamicBundle(builder.Environment);
+```
+
 
 ### Enable Middleware
 
 ```csharp
 app.UseWebOptimizer();
 ```
-
-### Use Custom Asset Folder Paths
-
-```csharp
-builder.Services.AddWebOptimizer(pipeline =>
-{
-    DynamicBundleMapper.Register(pipeline, JsRoot: "assets/js", CssRoot: "assets/styles", isDevelopment: app.Environment.IsDevelopment());
-});
-```
-
-> Asset paths are relative to `wwwroot/`.
 
 ---
 
@@ -101,6 +112,7 @@ builder.Services.AddWebOptimizer(pipeline =>
 
 ```cshtml
 <head>
+    <critical-style-bundle-loader/>
     <style-bundle-loader />
 </head>
 <body>
@@ -119,8 +131,7 @@ builder.Services.AddWebOptimizer(pipeline =>
 ✅ Minification only in production  
 ✅ Controller & action bundle granularity  
 ✅ TagHelpers for clean layout injection  
-✅ Auto-registers bundles at startup  
-✅ Supports custom asset folder paths  
+✅ Auto-registers bundles at startup   
 ✅ Inline critical CSS (with skip support)  
 ✅ Cache-busting in development mode
 
@@ -136,14 +147,6 @@ Minification is automatically applied **only in production**. When `isDevelopmen
 
 - Combines all `.css` files under `wwwroot/css/critical/` into a single `<style>` tag.
 - Injected above all other stylesheets.
-- Skippable per-action using:
-
-```csharp
-[DisableCriticalCss]
-public IActionResult MyView() => View();
-```
-
-Or globally via the `Register` toggle (v1.1.1+).
 
 ---
 
@@ -152,7 +155,7 @@ Or globally via the `Register` toggle (v1.1.1+).
 To prevent browser caching during local testing, development mode appends `?v=<random>` to asset URLs.
 
 ```html
-<link rel="stylesheet" href="/bundles/home.min.css?v=202406160915" />
+<link rel="stylesheet" href="/bundles/home.min.css?v=46174bc4-f61a-4382-a733-81ffe8c73074" />
 ```
 
 In production, clean URLs are used for optimal caching.
@@ -171,18 +174,41 @@ Requesting `/Home/Index` loads:
 <script src="/bundles/home/index.min.js"></script>
 ```
 
----
-
-## 🧭 Roadmap
-
-- Asset versioning mode selection (assembly version, timestamp, none) → v2.0.0  
-- Deduplication of critical/main CSS  
-- Inline critical JS  
-- DevTools warning system for library dependencies  
-- CLI asset validator  
-- Razor directives for explicit override
 
 ---
+
+## ⚠️ Limitations in v1.1.0
+
+While the current version provides automated and scoped asset bundling, some customization options are deferred to future releases for architectural clarity.
+
+### 🔒 Known Limitations
+
+- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()` in `v1.1.0`.
+- ❌ **Dynamic runtime configuration** of asset logic is not exposed yet.
+- ✅ A static convention-based pathing system is in place (e.g., `wwwroot/css/Controller/Action/...`).
+
+These constraints preserve legacy compatibility and ensure minimal setup in `v1.1.0`.
+
+---
+
+## 🛣 Planned for v2.0.0
+
+A new configuration object will be introduced to allow:
+
+- ✅ Custom `JsRoot`, `CssRoot`, `CriticalCssRoot` directories.
+- ✅ Optional feature toggles for minification, cache-busting, critical asset control.
+- ✅ Fluent configuration syntax.
+
+```csharp
+builder.Services.AddDynamicBundle(new DynamicBundleConfig
+{
+    JsRoot = "wwwroot/assets/js",
+    CssRoot = "wwwroot/assets/css",
+    CriticalCssRoot = "wwwroot/assets/critical",
+    EnableCacheBusting = true
+});
+
+```
 
 ## 👤 Author
 

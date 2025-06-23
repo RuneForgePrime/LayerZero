@@ -1,44 +1,62 @@
-# 📦 LayerZero.Tools.Web – Changelog
+# 📦 Changelog
 
-## [1.1.0] - 2025-06-XX
+All notable changes to this project are documented in this file.
 
-### ✨ Added
+---
 
-- **Critical CSS Support**
-  - Inline injection of CSS required for the first paint, improving perceived performance.
-  - Critical CSS files are parsed and validated:
-    - Invalid rules are rejected.
-    - Entirely invalid or empty files are automatically skipped.
-  - Stored by default in the `css/critical/` folder (can be customized).
-  - Zero-cost if unused — works cleanly within the bundling pipeline.
-
-- **Development Cache-Busting**
-  - Minimal cache-busting logic for local development scenarios.
-  - Activated by setting the `isDevelopment` flag in `DynamicBundleMapper`.
-  - Ensures fresh asset delivery during development without affecting production behavior.
-
-## [1.0.1] - 2025-06-13
+## [1.1.0] - 2025-06-21
 
 ### ✨ Added
-- Support for **conditional minification**:
-  - Bundles are served unminified in `Development` environment (`IWebHostEnvironment.IsDevelopment()`).
-  - Minification remains enabled in `Production`.
-- Guard checks using `SpindleTreeGuard`:
-  - Skips empty directories based on file patterns (e.g., `.js`, `.css`).
-  - Ensures clean and minimal bundle generation.
 
-### 🔧 Changed
-- Refactored `BundleBuilder.Register()` for improved clarity and conditional execution.
-- Improved path normalization (cross-platform compatibility with `/` separators).
+- **Critical CSS Support**:
+  - New support for inline critical CSS under `wwwroot/css/critical/`.
+  - Multiple files are merged into a single `<style>` tag injected before all other bundles.
+  - Graceful fallback for broken or malformed CSS files (logged, but not injected).
 
-### 🛠️ Technical
-- Introduced stricter directory checks to avoid unnecessary minification or empty bundles.
+- **Improved Development Mode Behavior**:
+  - Cache-busting enabled for local development via version query strings (e.g., `?v=timestamp`).
+  - Minification disabled automatically when `isDevelopment` is true.
+
+### 🛠 Fixed
+
+- ⚠️ **Environment Detection Bug**:
+  - `AddDynamicBundle()` now accepts optional `IWebHostEnvironment` to correctly detect development/production modes.
+  - If not supplied, it defaults to `isDevelopment = false` for backward compatibility.
+
+### 📌 Known Limitations
+
+- ❌ **Custom asset folder paths** are not yet configurable.
+- ❌ **No configuration object or runtime overrides**—behavior is static and convention-bound.
+
+### 🛣 Roadmap
+
+Planned for `v2.0.0`:
+
+- Configuration object support (`DynamicBundleConfig`)
+- Customizable root paths (`JsRoot`, `CssRoot`, `CriticalCssRoot`)
+- Fine-grained control over cache-busting, minification, and diagnostics
+- Razor directives for override support
+- Critical JS injection
+- DevTools diagnostics page
+
+---
+
+## [1.0.1] - 2025-06-10
+
+### ✅ Fixed
+
+- TagHelper bug where controller/action resolution failed in certain nested route structures.
+- Bundle generation skipped when asset directories were empty (edge case regression).
 
 ---
 
 ## [1.0.0] - 2025-06-08
 
-### ✨ Added
-- Initial release of `LayerZero.Tools.Web`.
-- Automatic JS/CSS bundle generation based on controller/action folder structure.
-- Integration with WebOptimizer pipeline.
+### 🎉 Initial Release
+
+- Convention-based bundle generation using WebOptimizer
+- Razor TagHelpers for automatic injection
+- Supports controller/action folder structure
+- Works with default WebOptimizer pipeline
+
+---
