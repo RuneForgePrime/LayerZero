@@ -1,4 +1,9 @@
 ﻿# 📦 Dynamic Bundle Loader for ASP.NET Core
+[![NuGet](https://img.shields.io/nuget/v/LayerZero.Tools.Web.svg)](https://www.nuget.org/packages/LayerZero.Tools.Web)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/LayerZero.Tools.Web.svg)](https://www.nuget.org/packages/LayerZero.Tools.Web)
+![.NET](https://img.shields.io/badge/.NET-8.0-blue)
+
+---
 
 A convention-based asset bundling system for .NET 8+ using WebOptimizer. Automatically discovers and injects CSS/JS bundles per controller and action using Razor TagHelpers.
 
@@ -14,6 +19,7 @@ Eliminates manual asset management in Razor views by scanning controller/action 
 
 ```
 wwwroot/
+|   
 +---css
 |   |   site.css
 |   |   
@@ -34,21 +40,28 @@ wwwroot/
 +---js
 |   |   site.js
 |   |   
-|   \---Controller
-|       \---Home
-|           |   Script.js
-|           |   
-|           +---Index
-|           |       Script.js
-|           |       
-|           \---Privacy
-|                   flickity.pkgd.min.js
-|                   JavaScript.js
-|                   
+|   +---Controller
+|   |   \---Home
+|   |       |   Script.js
+|   |       |   
+|   |       +---Index
+|   |       |       Script.js
+|   |       |       
+|   |       \---Privacy
+|   |               flickity.pkgd.min.js
+|   |               JavaScript.js
+|   |               
+|   \---critical
+|           JavaScript-cr1.js
+|           JavaScript-cr2.js
+|           
 \---lib
+
 ```
 
-`Controller/Action` structure drives bundle discovery. nd a special folder for `critical CSS`
+ - `Controller/Action` structure drives bundle discovery. 
+ - A special folder for `critical CSS` (`wwwwroot/css/critical`)
+ - A special folder for `critical JS` (`wwwwroot/js/critical`)
 
 
 ---
@@ -117,11 +130,12 @@ app.UseWebOptimizer();
 </head>
 <body>
     @RenderBody()
+    <critical-script-bundle-loader/>
     <script-bundle-loader />
 </body>
 ```
 
-> Action-specific bundles override controller-wide ones.
+> AController-wide assets load by default and are overridden by action-specific bundles if found.
 
 ---
 
@@ -132,7 +146,8 @@ app.UseWebOptimizer();
 ✅ Controller & action bundle granularity  
 ✅ TagHelpers for clean layout injection  
 ✅ Auto-registers bundles at startup   
-✅ Inline critical CSS (with skip support)  
+✅ Inline critical CSS   
+✅ Inline critical Js 
 ✅ Cache-busting in development mode
 
 ---
@@ -149,6 +164,15 @@ Minification is automatically applied **only in production**. When `isDevelopmen
 - Injected above all other stylesheets.
 
 ---
+
+## 🔥 Critical JS (v1.2.0+)
+
+- Combines all `.js` files under `wwwroot/js/critical/` into a single `<script>` tag.
+- Injected above all other scripts.
+- In `v1.2.0`, scripts are injected as-is — no syntax validation or dependency analysis is performed yet.
+
+---
+
 
 ## 🚫 Cache-Busting in Development
 
@@ -170,6 +194,7 @@ Requesting `/Home/Index` loads:
 <style>/* critical CSS injected here */</style>
 <link rel="stylesheet" href="/bundles/home.min.css" />
 <link rel="stylesheet" href="/bundles/home/index.min.css" />
+<script>/* critical JS injected here */</script>
 <script src="/bundles/home.min.js"></script>
 <script src="/bundles/home/index.min.js"></script>
 ```
@@ -177,17 +202,13 @@ Requesting `/Home/Index` loads:
 
 ---
 
-## ⚠️ Limitations in v1.1.0
-
-While the current version provides automated and scoped asset bundling, some customization options are deferred to future releases for architectural clarity.
-
 ### 🔒 Known Limitations
 
-- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()` in `v1.1.0`.
+- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()` same as `v1.1.0`.
 - ❌ **Dynamic runtime configuration** of asset logic is not exposed yet.
 - ✅ A static convention-based pathing system is in place (e.g., `wwwroot/css/Controller/Action/...`).
 
-These constraints preserve legacy compatibility and ensure minimal setup in `v1.1.0`.
+These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
 
 ---
 
