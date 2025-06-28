@@ -7,11 +7,17 @@
 
 A convention-based asset bundling system for .NET 8+ using WebOptimizer. Automatically discovers and injects CSS/JS bundles per controller and action using Razor TagHelpers.
 
+> 🧩 Not a full framework.\
+> ❌ Doesn’t replace WebOptimizer.\
+> ✅ Enhances it with dynamic discovery, layout scoping, and critical asset control.
+
 ---
 
 ## 🔍 Purpose
 
+
 Eliminates manual asset management in Razor views by scanning controller/action folder structures and auto-generating optimized bundles at runtime.
+
 
 ---
 
@@ -77,15 +83,16 @@ dotnet add package LayerZero.Tools.Web
 Or reference the project directly:
 
 ```bash
-dotnet new classlib -n DynamicBundleLoader
-dotnet add reference ../DynamicBundleLoader/DynamicBundleLoader.csproj
+dotnet new classlib -n LayerZero.Tools.Web
+dotnet add reference ../LayerZero.Tools.Web/LayerZero.Tools.Web.csproj
 ```
 
 ### 2. NuGet Dependencies
 
 ```xml
 <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.456" />
-<FrameworkReference Include="Microsoft.AspNetCore.App" />
+<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.456" />
+<FrameworkReference Include="LayerZero.Tools" Version="1.0.1"/>
 ```
 
 ---
@@ -135,26 +142,30 @@ app.UseWebOptimizer();
 </body>
 ```
 
-> AController-wide assets load by default and are overridden by action-specific bundles if found.
+> Controller-wide assets load by default and are overridden by action-specific bundles if found.
 
 ---
 
 ## 💡 Features
 
-✅ Convention-over-configuration  
-✅ Minification only in production  
-✅ Controller & action bundle granularity  
-✅ TagHelpers for clean layout injection  
-✅ Auto-registers bundles at startup   
-✅ Inline critical CSS   
-✅ Inline critical Js 
+✅ Convention-over-configuration\
+✅ Minification only in production\
+✅ Controller & action bundle granularity\
+✅ TagHelpers for clean layout injection\
+✅ Auto-registers bundles at startup\
+✅ Inline critical CSS\
+✅ Inline critical JS\
 ✅ Cache-busting in development mode
 
 ---
 
-## 🔒 Minification Mode
+## ⚠️ Known Limitations
 
-Minification is automatically applied **only in production**. When `isDevelopment` is true, JS/CSS are included unminified for easier debugging.
+- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()` same as `v1.1.0`.
+- ❌ **Dynamic runtime configuration** of asset logic is not exposed yet.
+- ✅ A static convention-based pathing system is in place (e.g., `wwwroot/css/Controller/Action/...`).
+
+These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
 
 ---
 
@@ -167,12 +178,11 @@ Minification is automatically applied **only in production**. When `isDevelopmen
 
 ## 🔥 Critical JS (v1.2.0+)
 
-- Combines all `.js` files under `wwwroot/js/critical/` into a single `<script>` tag.
-- Injected above all other scripts.
+- Combines all `.js` files under `wwwroot/js/critical/` into one `<script>` tag.
+- Injected **before** all other scripts for optimal early execution.
 - In `v1.2.0`, scripts are injected as-is — no syntax validation or dependency analysis is performed yet.
 
 ---
-
 
 ## 🚫 Cache-Busting in Development
 
@@ -199,17 +209,6 @@ Requesting `/Home/Index` loads:
 <script src="/bundles/home/index.min.js"></script>
 ```
 
-
----
-
-### 🔒 Known Limitations
-
-- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()` same as `v1.1.0`.
-- ❌ **Dynamic runtime configuration** of asset logic is not exposed yet.
-- ✅ A static convention-based pathing system is in place (e.g., `wwwroot/css/Controller/Action/...`).
-
-These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
-
 ---
 
 ## 🛣 Planned for v2.0.0
@@ -228,8 +227,9 @@ builder.Services.AddDynamicBundle(new DynamicBundleConfig
     CriticalCssRoot = "wwwroot/assets/critical",
     EnableCacheBusting = true
 });
-
 ```
+
+---
 
 ## 👤 Author
 
