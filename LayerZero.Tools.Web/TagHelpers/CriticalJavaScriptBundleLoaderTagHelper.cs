@@ -25,9 +25,9 @@ namespace LayerZero.Tools.Web.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = null;
-            var css = this._bundleRegistry.GetCriticalCss();
-            if (!string.IsNullOrEmpty(css))
-                output.Content.SetHtmlContent(@$"<!-- Critical CSS Start --><style>{css}</style><!-- Critical CSS End -->");
+            var js = this._bundleRegistry.GetCriticalJs();
+            if (!string.IsNullOrEmpty(js))
+                output.Content.SetHtmlContent(@$"<!-- Critical Js Start --><script>{js}</script><!-- Critical Js End -->");
             else
                 output.SuppressOutput();
         }
