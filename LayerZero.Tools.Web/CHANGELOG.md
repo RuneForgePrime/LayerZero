@@ -3,6 +3,22 @@
 All notable changes to this project are documented in this file.
 
 ---
+## [1.3.0] - 2025-07-06
+
+### ✨ Added
+
+- **Critical JS Support**:
+  - Introduced support for `wwwroot/js/critical/` folder.
+  - JS files placed in this path are parsed, merged, and injected **before regular bundles**.
+  - Designed for inline or early-execution scripts such as feature detection, cookie banners, or user agent fixes.
+
+### 🧭 Notes
+
+- Like its CSS counterpart, the critical JS logic is **scoped globally** for now.
+- Per-controller/action scoping is under consideration for future versions, alongside dynamic loading and async asset management.
+- This update finalizes the `v1.x` critical asset foundation before introducing partial view support in `2.0.0`.
+
+---
 
 ## [1.2.0] - 2025-06-24 *(planned)*
 
