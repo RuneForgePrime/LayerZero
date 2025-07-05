@@ -66,8 +66,8 @@ wwwroot/
 ```
 
  - `Controller/Action` structure drives bundle discovery. 
- - A special folder for `critical CSS` (`wwwwroot/css/critical`)
- - A special folder for `critical JS` (`wwwwroot/js/critical`)
+ - A special folder for `critical CSS` (`wwwroot/css/critical`)
+ - A special folder for `critical JS` (`wwwroot/js/critical`)
 
 
 ---
@@ -183,6 +183,20 @@ These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
 - In `v1.2.0`, scripts are injected as-is — no syntax validation or dependency analysis is performed yet.
 
 ---
+
+## 🆕 What's New in v1.3.0
+
+LayerZero.Tools.Web now includes **Critical JavaScript** support:
+
+- Place scripts in `wwwroot/js/critical/`
+- Files are parsed and rendered inline, **before all standard JS bundles**
+- Useful for early execution logic such as feature flags, layout adjustments, or performance-critical bootstraps
+
+> Critical JS handling mirrors Critical CSS introduced in `v1.2.0`, forming a complete early asset delivery strategy.
+
+
+---
+
 
 ## 🚫 Cache-Busting in Development
 

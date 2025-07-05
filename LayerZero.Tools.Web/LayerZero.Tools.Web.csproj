@@ -7,7 +7,7 @@
     <!-- NuGet Metadata -->
     <AssemblyName>LayerZero.Tools.Web</AssemblyName>
     <PackageId>LayerZero.Tools.Web</PackageId>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <Authors>RuneForgePrime</Authors>
     <Company>LayerZero</Company>
     <Description>Convention-based dynamic JS/CSS bundling and injection system for ASP.NET Core using WebOptimizer.</Description>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp.Css" Version="0.17.0" />
+    <PackageReference Include="Esprima" Version="3.0.5" />
     <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.436" />
   </ItemGroup>
 
