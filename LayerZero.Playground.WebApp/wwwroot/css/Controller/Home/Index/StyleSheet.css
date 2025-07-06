@@ -1,0 +1,122 @@
+﻿@import url("https://fonts.googleapis.com/css?family=Open+Sans");
+
+.content:before,
+.header:before,
+.content:after,
+.header:after {
+    content: "";
+    display: table;
+}
+
+.content:after,
+.header:after {
+    clear: both;
+}
+
+.contentBlock,
+.headerBlock {
+    float: left;
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+}
+
+.content,
+.header {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cardBackSide,
+.cardFrontSide {
+    backface-visibility: hidden;
+    background-color: #fff;
+    border-radius: 0.3rem;
+    box-shadow: 0.15rem 0.15rem 0.1rem 0 rgba(0, 0, 0, 0.3);
+    color: #5e5e5e;
+    cursor: pointer;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: 0.75s;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+
+html,
+body,
+h1,
+h2,
+p {
+    margin: 0;
+}
+
+.header {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.headerBlock {
+    width: 100%;
+    align-items: center;
+    display: flex;
+    font-size: 2rem;
+    height: 5rem;
+}
+
+.content {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    margin-bottom: 5rem;
+}
+
+.contentBlock {
+    width: 33.3333333333%;
+    perspective: 50rem;
+    perspective-origin: center top;
+}
+
+.contentBlock img {
+    height: auto;
+    width: 100%;
+}
+
+.contentBlock:hover .cardFrontSide {
+    transform: rotateY(-180deg);
+}
+
+.contentBlock:hover .cardBackSide {
+    transform: rotateY(0);
+}
+
+.cardFrontSide {
+    height: auto;
+    position: relative;
+    width: 100%;
+}
+
+.cardFrontContent {
+    padding: 0.5rem 1rem 1rem;
+}
+
+.cardFrontContent h2 {
+    color: #444444;
+    padding-bottom: 0.5rem;
+}
+
+.cardBackSide {
+    height: 100%;
+    left: 15px;
+    padding: 1rem;
+    position: absolute;
+    top: 0;
+    transform: rotateY(180deg);
+    width: calc(100% - (15px * 2));
+}

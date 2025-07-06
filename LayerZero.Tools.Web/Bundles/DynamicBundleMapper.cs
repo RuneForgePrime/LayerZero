@@ -20,8 +20,11 @@ namespace LayerZero.Tools.Web.Bundles
             string JsRoot = "js/controller", 
             string CssRoot = "css/controller",
             string CriticalCssRoot = "css/critical",
+            string CriticalJsRoot = "js/critical",
             bool isDevelopment = false)
         {
+            _bundles.SetEnv(isDevelopment);
+
             var rootDirectory = @"wwwroot/";
 
             var rootFolderJs = @$"{rootDirectory}{JsRoot}";
@@ -63,10 +66,10 @@ namespace LayerZero.Tools.Web.Bundles
 
 
             var rootFolderCss = @$"{rootDirectory}{CssRoot}";
-            var CsssFolders = Directory.GetDirectories(rootFolderCss, "*", SearchOption.AllDirectories);
+            var CssFolders = Directory.GetDirectories(rootFolderCss, "*", SearchOption.AllDirectories);
 
 
-            foreach (var item in CsssFolders)
+            foreach (var item in CssFolders)
             {
                 var relativePath = item.Replace(rootFolderCss, string.Empty);
                 var nodes = relativePath.Split("\\").Where(s => !string.IsNullOrEmpty(s)).ToList();
@@ -106,7 +109,7 @@ namespace LayerZero.Tools.Web.Bundles
             var cssCriticalFiles = SpindleTree.GetAllFilesPath(rootFolderCssCritical, FileExtensions: [".css"]);
 
             var criticalCss = new StringBuilder();
-            cssCriticalFiles.ForEach(f =>
+            cssCriticalFiles?.ForEach(f =>
             {
                 var rules = CssFileParser.Analyse(f);
                 criticalCss.AppendLine(rules);
@@ -114,6 +117,20 @@ namespace LayerZero.Tools.Web.Bundles
 
             if(!string.IsNullOrEmpty(criticalCss.ToString()))
                 _bundles.SetCriticalCss(criticalCss.ToString());
+
+
+            var rootFolderJsCritical = $@"{rootDirectory}{CriticalJsRoot}";
+            var jsCriticalFiles = SpindleTree.GetAllFilesPath(rootFolderJsCritical, FileExtensions: [".js"]);
+
+            var criticalJs = new StringBuilder();
+            jsCriticalFiles?.ForEach(f =>
+            {
+                var script = JsFileParser.Analyse(f);
+                criticalJs.AppendLine(script);
+            });
+
+            if (!string.IsNullOrEmpty(criticalJs.ToString()))
+                _bundles.SetCriticalJs(criticalJs.ToString());
 
         }
     }

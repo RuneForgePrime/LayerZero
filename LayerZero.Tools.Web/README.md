@@ -1,154 +1,250 @@
 ﻿# 📦 Dynamic Bundle Loader for ASP.NET Core
+[![NuGet](https://img.shields.io/nuget/v/LayerZero.Tools.Web.svg)](https://www.nuget.org/packages/LayerZero.Tools.Web)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/LayerZero.Tools.Web.svg)](https://www.nuget.org/packages/LayerZero.Tools.Web)
+![.NET](https://img.shields.io/badge/.NET-8.0-blue)
+
+---
 
 A convention-based asset bundling system for .NET 8+ using WebOptimizer. Automatically discovers and injects CSS/JS bundles per controller and action using Razor TagHelpers.
 
+> 🧩 Not a full framework.\
+> ❌ Doesn’t replace WebOptimizer.\
+> ✅ Enhances it with dynamic discovery, layout scoping, and critical asset control.
+
+---
+
 ## 🔍 Purpose
 
+
 Eliminates manual asset management in Razor views by scanning controller/action folder structures and auto-generating optimized bundles at runtime.
+
+
+---
 
 ## 🗂 Folder Convention
 
 ```
 wwwroot/
-├── js/
-│   └── controllers/
-│       ├── Home/
-│       │   ├── index.js
-│       │   └── details.js
-│       └── Dashboard/
-│           └── overview.js
-└── css/
-    └── controllers/
-        ├── Home/
-        │   ├── index.css
-        │   └── shared.css
-        └── Dashboard/
-            └── overview.css
+|   
++---css
+|   |   site.css
+|   |   
+|   +---Controller
+|   |   \---Home
+|   |       |   Home.css
+|   |       |   
+|   |       +---Index
+|   |       |       StyleSheet.css
+|   |       |       
+|   |       \---Privacy
+|   |               StyleSheet.css
+|   |               
+|   \---critical
+|           StyleSheet-cr1.css
+|           StyleSheet-cr2.css
+|           
++---js
+|   |   site.js
+|   |   
+|   +---Controller
+|   |   \---Home
+|   |       |   Script.js
+|   |       |   
+|   |       +---Index
+|   |       |       Script.js
+|   |       |       
+|   |       \---Privacy
+|   |               flickity.pkgd.min.js
+|   |               JavaScript.js
+|   |               
+|   \---critical
+|           JavaScript-cr1.js
+|           JavaScript-cr2.js
+|           
+\---lib
+
 ```
 
-`Controller/Action` structure drives bundle discovery.
+ - `Controller/Action` structure drives bundle discovery. 
+ - A special folder for `critical CSS` (`wwwroot/css/critical`)
+ - A special folder for `critical JS` (`wwwroot/js/critical`)
+
+
+---
 
 ## ⚙️ Installation
 
-1. Create and reference the library project
+### 1. Add the NuGet Package
 
 ```
-dotnet new classlib -n DynamicBundleLoader
+dotnet add package LayerZero.Tools.Web
 ```
 
-Add the reference in your web app:
+Or reference the project directly:
 
-```
-dotnet add reference ../DynamicBundleLoader/DynamicBundleLoader.csproj
+```bash
+dotnet new classlib -n LayerZero.Tools.Web
+dotnet add reference ../LayerZero.Tools.Web/LayerZero.Tools.Web.csproj
 ```
 
-2. NuGet Dependencies
+### 2. NuGet Dependencies
 
 ```xml
 <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.456" />
-<FrameworkReference Include="Microsoft.AspNetCore.App" />
+<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.456" />
+<FrameworkReference Include="LayerZero.Tools" Version="1.0.1"/>
 ```
+
+---
 
 ## 🚀 Usage
 
-__Register bundles in `Program.cs`__
+### Register in `Program.cs`
 
 ```csharp
-builder.Services.AddSingleton(DynamicBundleMapper.Bundles);
-builder.Services.AddWebOptimizer(pipeline =>
-{
-    DynamicBundleMapper.Register(pipeline);
-});
+builder.Services.AddDynamicBundle();
 ```
 
-__Middleware setup__
+Or if you want to enable cache-busting on dev environment:
 
-Ensure the WebOptimizer middleware is added:
-
+```csharp
+builder.Services.AddDynamicBundle(builder.Environment);
 ```
+
+
+### Enable Middleware
+
+```csharp
 app.UseWebOptimizer();
 ```
 
-__Custom asset folder paths__
-
-If you use a custom structure:
-
-```csharp
-builder.Services.AddWebOptimizer(pipeline =>
-{
-    DynamicBundleMapper.Register(pipeline, JsRoot: "assets/js", CssRoot: "assets/styles");
-});
-```
-
-Make sure the paths are relative to `wwwroot/`. Absolute paths or incorrect base folders will result in missing bundles.
-
-## ⚠️ CSS Path Warning
-
-When using relative URLs in CSS (e.g. `url('../images/icon.svg')`), remember:
-
-Bundles are served from `/bundles/...`
-
-Asset references like images or fonts must resolve correctly from the bundle's URL, not the source folder.
-
-Fix: Use root-relative paths (`/images/icon.svg`) or ensure your build pipeline rewrites paths.
+---
 
 ## 🧠 TagHelpers
 
-Add to `_ViewImports.cshtml`
+### Register in `_ViewImports.cshtml`
 
 ```cshtml
-@addTagHelper *, DynamicBundleLoader
+@addTagHelper *, LayerZero.Tools.Web
 ```
 
-In `_Layout.cshtml`
+### Use in `_Layout.cshtml`
 
 ```cshtml
 <head>
+    <critical-style-bundle-loader/>
     <style-bundle-loader />
 </head>
 <body>
     @RenderBody()
+    <critical-script-bundle-loader/>
     <script-bundle-loader />
 </body>
 ```
 
-Action-specific bundles override controller-wide ones (loaded after).
+> Controller-wide assets load by default and are overridden by action-specific bundles if found.
 
-## 📦 Features
+---
 
-✅ Convention-over-configuration
+## 💡 Features
 
-✅ Minification via WebOptimizer
+✅ Convention-over-configuration\
+✅ Minification only in production\
+✅ Controller & action bundle granularity\
+✅ TagHelpers for clean layout injection\
+✅ Auto-registers bundles at startup\
+✅ Inline critical CSS\
+✅ Inline critical JS\
+✅ Cache-busting in development mode
 
-✅ Controller & action bundle granularity
+---
 
-✅ TagHelpers for clean layout injection
+## ⚠️ Known Limitations
 
-✅ Auto-registers bundles at startup
+- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()` same as `v1.1.0`.
+- ❌ **Dynamic runtime configuration** of asset logic is not exposed yet.
+- ✅ A static convention-based pathing system is in place (e.g., `wwwroot/css/Controller/Action/...`).
 
-✅ Supports custom asset folder paths
+These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
+
+---
+
+## 🔥 Critical CSS (v1.1.0+)
+
+- Combines all `.css` files under `wwwroot/css/critical/` into a single `<style>` tag.
+- Injected above all other stylesheets.
+
+---
+
+## 🔥 Critical JS (v1.2.0+)
+
+- Combines all `.js` files under `wwwroot/js/critical/` into one `<script>` tag.
+- Injected **before** all other scripts for optimal early execution.
+- In `v1.2.0`, scripts are injected as-is — no syntax validation or dependency analysis is performed yet.
+
+---
+
+## 🆕 What's New in v1.3.0
+
+LayerZero.Tools.Web now includes **Critical JavaScript** support:
+
+- Place scripts in `wwwroot/js/critical/`
+- Files are parsed and rendered inline, **before all standard JS bundles**
+- Useful for early execution logic such as feature flags, layout adjustments, or performance-critical bootstraps
+
+> Critical JS handling mirrors Critical CSS introduced in `v1.2.0`, forming a complete early asset delivery strategy.
+
+
+---
+
+
+## 🚫 Cache-Busting in Development
+
+To prevent browser caching during local testing, development mode appends `?v=<random>` to asset URLs.
+
+```html
+<link rel="stylesheet" href="/bundles/home.min.css?v=46174bc4-f61a-4382-a733-81ffe8c73074" />
+```
+
+In production, clean URLs are used for optimal caching.
+
+---
 
 ## ✨ Example
 
 Requesting `/Home/Index` loads:
 
 ```html
+<style>/* critical CSS injected here */</style>
 <link rel="stylesheet" href="/bundles/home.min.css" />
 <link rel="stylesheet" href="/bundles/home/index.min.css" />
+<script>/* critical JS injected here */</script>
 <script src="/bundles/home.min.js"></script>
 <script src="/bundles/home/index.min.js"></script>
 ```
 
-## 🔮 Roadmap (optional additions)
+---
 
-Asset versioning (?v=hash)
+## 🛣 Planned for v2.0.0
 
-Inline critical CSS
+A new configuration object will be introduced to allow:
 
-TagHelper preload hints
+- ✅ Custom `JsRoot`, `CssRoot`, `CriticalCssRoot` directories.
+- ✅ Optional feature toggles for minification, cache-busting, critical asset control.
+- ✅ Fluent configuration syntax.
 
-Razor directives for explicit override
+```csharp
+builder.Services.AddDynamicBundle(new DynamicBundleConfig
+{
+    JsRoot = "wwwroot/assets/js",
+    CssRoot = "wwwroot/assets/css",
+    CriticalCssRoot = "wwwroot/assets/critical",
+    EnableCacheBusting = true
+});
+```
+
+---
 
 ## 👤 Author
 
-LayerZero Team – Built for clean architecture and developer clarity.
+**LayerZero Team** — Built for clean architecture and developer clarity.

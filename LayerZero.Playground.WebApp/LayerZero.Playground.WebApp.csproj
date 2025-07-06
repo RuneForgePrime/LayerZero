@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\css\Controller\Home\Index\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\LayerZero.Tools.Web\LayerZero.Tools.Web.csproj" />
   </ItemGroup>
 

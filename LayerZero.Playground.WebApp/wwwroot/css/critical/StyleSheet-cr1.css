@@ -16,3 +16,7 @@ tag{
     width: "px";
     height: 150px
 }
+
+html, body{
+    background: #000;
+}
