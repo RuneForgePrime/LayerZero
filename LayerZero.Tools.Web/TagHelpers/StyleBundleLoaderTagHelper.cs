@@ -35,7 +35,7 @@ namespace LayerZero.Tools.Web.TagHelpers
 
             string html = string.Empty;
             var cacheBusting = string.Empty;
-            if(_bundleRegistry.IsDev())
+            if(_bundleRegistry.IsCacheBustingActive())
                 cacheBusting = $"?v={Guid.NewGuid().ToString()}";
 
 

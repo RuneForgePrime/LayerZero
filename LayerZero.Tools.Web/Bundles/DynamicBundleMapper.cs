@@ -1,5 +1,6 @@
 ﻿using LayerZero.Tools.Guard;
 using LayerZero.Tools.IO;
+using LayerZero.Tools.Web.Configuration;
 using LayerZero.Tools.Web.Parser;
 using LayerZero.Tools.Web.Services.Bundles;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,18 +17,13 @@ namespace LayerZero.Tools.Web.Bundles
     {
         public static BundleCollection _bundles { get; } = new();
 
-        public static void Register(IAssetPipeline pipeline, 
-            string JsRoot = "js/controller", 
-            string CssRoot = "css/controller",
-            string CriticalCssRoot = "css/critical",
-            string CriticalJsRoot = "js/critical",
-            bool isDevelopment = false)
+        public static void Register(IAssetPipeline pipeline, BundleCollectionConfig Cfg)
         {
-            _bundles.SetEnv(isDevelopment);
+            _bundles.SetCacheBusting(Cfg.EnableCacheBusting);
 
             var rootDirectory = @"wwwroot/";
 
-            var rootFolderJs = @$"{rootDirectory}{JsRoot}";
+            var rootFolderJs = @$"{rootDirectory}{Cfg.JsRoot}";
             var JsFolders = Directory.GetDirectories(rootFolderJs, "*", SearchOption.AllDirectories);
 
 
@@ -46,7 +42,7 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
                     _bundles.RegisterJsBundle(nodes[0]);
 
-                    if(isDevelopment)
+                    if(Cfg.EnableCacheBusting)
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js");
                     else
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js").MinifyJavaScript();
@@ -57,7 +53,7 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
 
                     _bundles.RegisterJsBundle(nodes[0], nodes[1]);
-                    if (isDevelopment)
+                    if (Cfg.EnableCacheBusting)
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js");
                     else
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js").MinifyJavaScript();
@@ -65,7 +61,7 @@ namespace LayerZero.Tools.Web.Bundles
             }
 
 
-            var rootFolderCss = @$"{rootDirectory}{CssRoot}";
+            var rootFolderCss = @$"{rootDirectory}{Cfg.CssRoot}";
             var CssFolders = Directory.GetDirectories(rootFolderCss, "*", SearchOption.AllDirectories);
 
 
@@ -86,7 +82,7 @@ namespace LayerZero.Tools.Web.Bundles
 
                     _bundles.RegisterCssBundle(nodes[0]);
 
-                    if (isDevelopment)
+                    if (Cfg.EnableCacheBusting)
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css");
                     else
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css").MinifyCss();
@@ -97,14 +93,14 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
                     _bundles.RegisterCssBundle(nodes[0], nodes[1]);
 
-                    if (isDevelopment)
+                    if (Cfg.EnableCacheBusting)
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css");
                     else
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
                 }
             }
 
-            var rootFolderCssCritical = $@"{rootDirectory}{CriticalCssRoot}";
+            var rootFolderCssCritical = $@"{rootDirectory}{Cfg.CriticalCssRoot}";
 
             var cssCriticalFiles = SpindleTree.GetAllFilesPath(rootFolderCssCritical, FileExtensions: [".css"]);
 
@@ -119,7 +115,7 @@ namespace LayerZero.Tools.Web.Bundles
                 _bundles.SetCriticalCss(criticalCss.ToString());
 
 
-            var rootFolderJsCritical = $@"{rootDirectory}{CriticalJsRoot}";
+            var rootFolderJsCritical = $@"{rootDirectory}{Cfg.CriticalJsRoot}";
             var jsCriticalFiles = SpindleTree.GetAllFilesPath(rootFolderJsCritical, FileExtensions: [".js"]);
 
             var criticalJs = new StringBuilder();
@@ -132,6 +128,15 @@ namespace LayerZero.Tools.Web.Bundles
             if (!string.IsNullOrEmpty(criticalJs.ToString()))
                 _bundles.SetCriticalJs(criticalJs.ToString());
 
+        }
+
+
+        public static void RegisterBulk(IAssetPipeline pipeline, BundleCollectionConfig Cfg)
+        {
+            _bundles.SetBulkMode(true);
+            pipeline.AddCssBundle($"/bundles/bulk.min.css", $"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
+
+            pipeline.AddJavaScriptBundle($"/bundles/bulk.min.js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
         }
     }
 }

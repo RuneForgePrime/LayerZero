@@ -14,7 +14,8 @@ namespace LayerZero.Tools.Web.Services.Bundles
 
         private string _criticalCss = string.Empty;
         private string _criticalJs = string.Empty;
-        private bool _isDev = false;
+        private bool _isCacheBustingActive = false;
+        private bool _isBulkActive = false;
 
         public void RegisterJsBundle(string Controller, string? Action = null)
         {
@@ -56,12 +57,20 @@ namespace LayerZero.Tools.Web.Services.Bundles
 
         public string GetCriticalJs() => this._criticalJs;
 
-        public void SetEnv(bool IsDevelopment)
+        public void SetCacheBusting(bool IsCacheBustingActive)
         {
-            this._isDev = IsDevelopment;
+            this._isCacheBustingActive = IsCacheBustingActive;
         }
 
 
-        public bool IsDev() => this._isDev;
+        public bool IsCacheBustingActive() => this._isCacheBustingActive;
+
+        public void SetBulkMode(bool IsBulkActive) => _isBulkActive = IsBulkActive;
+
+        public bool IsBulkActive() => this._isBulkActive;
+
+        public HashSet<string> GetAllCss() => this._bundlesCss;
+
+        public HashSet<string?> GetAllJs() => this._bundlesJs;
     }
 }

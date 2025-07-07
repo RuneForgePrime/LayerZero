@@ -7,7 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDynamicBundle(builder.Environment);
+builder.Services.AddDynamicBundle(new LayerZero.Tools.Web.Configuration.BundleCollectionConfig
+{
+    EnableCacheBusting = builder.Environment.IsDevelopment(),
+    EnableBenchmark = true
+});
 
 var app = builder.Build();
 
