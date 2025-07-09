@@ -10,7 +10,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDynamicBundle(new LayerZero.Tools.Web.Configuration.BundleCollectionConfig
 {
     EnableCacheBusting = builder.Environment.IsDevelopment(),
-    EnableBenchmark = true
+    EnableBenchmark = true,
+    IsEnvironmentDev = false,
+    IsMinified = true,
 });
 
 var app = builder.Build();

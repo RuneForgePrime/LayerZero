@@ -20,6 +20,11 @@ namespace LayerZero.Tools.Web.Bundles
         public static void Register(IAssetPipeline pipeline, BundleCollectionConfig Cfg)
         {
             _bundles.SetCacheBusting(Cfg.EnableCacheBusting);
+            _bundles.SetIsDevEnv(Cfg.IsEnvironmentDev);
+            _bundles.SetIsMinified(Cfg.IsMinified);
+
+            var extension = Cfg.IsEnvironmentDev ? ".dev." : Cfg.IsMinified ? ".min." : ".";
+
 
             var rootDirectory = @"wwwroot/";
 
@@ -43,9 +48,9 @@ namespace LayerZero.Tools.Web.Bundles
                     _bundles.RegisterJsBundle(nodes[0]);
 
                     if(Cfg.EnableCacheBusting)
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js");
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}{extension}js", $"{_item}/*.js");
                     else
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}.min.js", $"{_item}/*.js").MinifyJavaScript();
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}{extension}js", $"{_item}/*.js").MinifyJavaScript();
                 }
                 else
                 {
@@ -54,9 +59,9 @@ namespace LayerZero.Tools.Web.Bundles
 
                     _bundles.RegisterJsBundle(nodes[0], nodes[1]);
                     if (Cfg.EnableCacheBusting)
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js");
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}js", $"{_item}/**/*.js");
                     else
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.js", $"{_item}/**/*.js").MinifyJavaScript();
+                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}js", $"{_item}/**/*.js").MinifyJavaScript();
                 }
             }
 
@@ -83,9 +88,9 @@ namespace LayerZero.Tools.Web.Bundles
                     _bundles.RegisterCssBundle(nodes[0]);
 
                     if (Cfg.EnableCacheBusting)
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css");
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}{extension}css", $"{_item}/*.css");
                     else
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}.min.css", $"{_item}/*.css").MinifyCss();
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}{extension}css", $"{_item}/*.css").MinifyCss();
                 }
                 else
                 {
@@ -94,9 +99,9 @@ namespace LayerZero.Tools.Web.Bundles
                     _bundles.RegisterCssBundle(nodes[0], nodes[1]);
 
                     if (Cfg.EnableCacheBusting)
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css");
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css");
                     else
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}.min.css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
+                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
                 }
             }
 
@@ -134,9 +139,12 @@ namespace LayerZero.Tools.Web.Bundles
         public static void RegisterBulk(IAssetPipeline pipeline, BundleCollectionConfig Cfg)
         {
             _bundles.SetBulkMode(true);
-            pipeline.AddCssBundle($"/bundles/bulk.min.css", $"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
 
-            pipeline.AddJavaScriptBundle($"/bundles/bulk.min.js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
+            var extension = Cfg.IsEnvironmentDev ? ".dev." : Cfg.IsMinified ? ".min." : ".";
+
+            pipeline.AddCssBundle($"/bundles/bulk{extension}css", $"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
+
+            pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
         }
     }
 }

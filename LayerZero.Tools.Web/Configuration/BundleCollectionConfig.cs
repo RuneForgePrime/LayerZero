@@ -14,5 +14,7 @@ namespace LayerZero.Tools.Web.Configuration
         public string CriticalCssRoot { get; set; } = "css/critical";
         public bool EnableCacheBusting { get; set; } = false;
         public bool EnableBenchmark { get; set; } = false;
+        public bool IsEnvironmentDev {  get; set; } = false;
+        public bool IsMinified { get; set; } = false;
     }
 }

@@ -41,19 +41,20 @@ namespace LayerZero.Tools.Web.TagHelpers
             output.TagName = null;
 
             string resource = string.Empty;
+            var extension = _bundleRegistry.GetExtension();
 
             if (AssetType is null || AssetType.Contains("css", StringComparison.OrdinalIgnoreCase))
             {
                 if (_bundleRegistry.IsBulkActive() && Filter is null)
                 {
-                    resource += @"<li> <a href='/bundles/bulk.min.css'> /bundles/bulk.min.css </a> </li>";
+                    resource += @$"<li> <a href='/bundles/bulk{extension}css'> /bundles/bulk{extension}css </a> </li>";
                 }
                 _bundleRegistry.GetAllCss()
                     .Where(css => Match(css))
                     .OrderBy(x => x)
                     .ToList()
                     .ForEach(css => {
-                        resource += $"<li> <a href='/bundles/{css}.min.css'> /bundles/{css}.min.css </a> </li>";
+                        resource += $"<li> <a href='/bundles/{css}{extension}css'> /bundles/{css}{extension}css </a> </li>";
                     });
             }
 
@@ -62,7 +63,7 @@ namespace LayerZero.Tools.Web.TagHelpers
 
                 if (_bundleRegistry.IsBulkActive() && Filter is null)
                 {
-                    resource += @" <li> <a href='/bundles/bulk.min.js'> /bundles/bulk.min.js  </a> </li>";
+                    resource += @$" <li> <a href='/bundles/bulk{extension}js'> /bundles/bulk{extension}js  </a> </li>";
                 }
 
                 _bundleRegistry.GetAllJs()
@@ -70,7 +71,7 @@ namespace LayerZero.Tools.Web.TagHelpers
                     .OrderBy(x => x)
                     .ToList()
                     .ForEach(js => {
-                        resource += $"<li> <a href='/bundles/{js}.min.js'> /bundles/{js}.min.js  </a> </li>";
+                        resource += $"<li> <a href='/bundles/{js}{extension}js'> /bundles/{js}{extension}js  </a> </li>";
                     });
             }
 
