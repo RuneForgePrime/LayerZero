@@ -43,18 +43,21 @@ namespace LayerZero.Tools.Web.TagHelpers
             string resource = string.Empty;
             var extension = _bundleRegistry.GetExtension();
 
+
+            var links = new List<string>();
+
+
             if (AssetType is null || AssetType.Contains("css", StringComparison.OrdinalIgnoreCase))
             {
                 if (_bundleRegistry.IsBulkActive() && Filter is null)
                 {
-                    resource += @$"<li> <a href='/bundles/bulk{extension}css'> /bundles/bulk{extension}css </a> </li>";
+                    links.Add(@$"/bundles/bulk{extension}css");
                 }
                 _bundleRegistry.GetAllCss()
                     .Where(css => Match(css))
-                    .OrderBy(x => x)
                     .ToList()
                     .ForEach(css => {
-                        resource += $"<li> <a href='/bundles/{css}{extension}css'> /bundles/{css}{extension}css </a> </li>";
+                        links.Add($"/bundles/{css}{extension}css");
                     });
             }
 
@@ -63,17 +66,27 @@ namespace LayerZero.Tools.Web.TagHelpers
 
                 if (_bundleRegistry.IsBulkActive() && Filter is null)
                 {
-                    resource += @$" <li> <a href='/bundles/bulk{extension}js'> /bundles/bulk{extension}js  </a> </li>";
+                    links.Add(@$"/bundles/bulk{extension}js");
                 }
 
                 _bundleRegistry.GetAllJs()
                     .Where(js => Match(js))
-                    .OrderBy(x => x)
                     .ToList()
                     .ForEach(js => {
-                        resource += $"<li> <a href='/bundles/{js}{extension}js'> /bundles/{js}{extension}js  </a> </li>";
+                        links.Add(@$"/bundles/{js}{extension}js");
                     });
             }
+
+            if (!links.Any())
+                return;
+
+            links = links.OrderBy(x => x).ToList();
+
+            links.ForEach(res => {
+                    resource += $"<li> <a href='{res}'> {res} </a> </li>";
+                });
+
+
 
 
 
