@@ -40,6 +40,8 @@ namespace LayerZero.Tools.Web.TagHelpers
             if(_bundleRegistry.IsCacheBustingActive())
                 cacheBusting = $"?v={Guid.NewGuid().ToString()}";
 
+            if(_bundleRegistry.IsCommonCssActive())
+                html += $"<link rel=\"stylesheet\" href=\"/bundles/common-styles{extension}css{cacheBusting}\" />";
 
             if (_bundleRegistry.IsCssBundleRegistered(controller))
                 html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}{extension}css{cacheBusting}\" />";

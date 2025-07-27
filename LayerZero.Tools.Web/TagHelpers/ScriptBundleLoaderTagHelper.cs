@@ -40,6 +40,9 @@ namespace LayerZero.Tools.Web.TagHelpers
             if (_bundleRegistry.IsCacheBustingActive())
                 cacheBusting = $"?v={Guid.NewGuid().ToString()}";
 
+            if (_bundleRegistry.IsCommonJsActive())
+                html += $"<script src=\"/bundles/common-scripts{extension}js{cacheBusting}\"></script>";
+
             if (_bundleRegistry.IsJsBundleRegistered(controller))
                 html += $"<script src=\"/bundles/{controller}{extension}js{cacheBusting}\"></script>";
 

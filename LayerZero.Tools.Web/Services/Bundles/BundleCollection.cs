@@ -18,6 +18,8 @@ namespace LayerZero.Tools.Web.Services.Bundles
         private bool _isBulkActive = false;
         private bool _isDevEnv = false;
         private bool _isMinified = false;
+        private bool _isCommonCssActive = false;
+        private bool _isCommonJsActive = false;
 
         public void RegisterJsBundle(string Controller, string? Action = null)
         {
@@ -77,5 +79,11 @@ namespace LayerZero.Tools.Web.Services.Bundles
         public void SetIsMinified(bool IsMinified) => this._isMinified = IsMinified;
 
         public string GetExtension() => _isDevEnv ? ".dev." : _isMinified ? ".min." : ".";
+
+        public void SetIsCommonCssActive(bool IsActive) => this._isCommonCssActive = IsActive;
+        public bool IsCommonCssActive() => this._isCommonCssActive;
+
+        public void SetIsCommonJsActive(bool IsActive) => this._isCommonJsActive = IsActive;
+        public bool IsCommonJsActive() => this._isCommonJsActive;
     }
 }

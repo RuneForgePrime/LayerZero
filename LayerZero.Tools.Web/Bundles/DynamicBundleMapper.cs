@@ -133,6 +133,21 @@ namespace LayerZero.Tools.Web.Bundles
             if (!string.IsNullOrEmpty(criticalJs.ToString()))
                 _bundles.SetCriticalJs(criticalJs.ToString());
 
+            if(!string.IsNullOrEmpty(Cfg.CommonCssRoot) && SpindleTree.GetAllFilesPath($@"{rootDirectory}{Cfg.CommonCssRoot}", FileExtensions: [".css"]).Any())
+            {
+                _bundles.SetIsCommonCssActive(true);
+                pipeline.AddCssBundle($"/bundles/common-styles{extension}css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css");
+            }
+
+
+            if (!string.IsNullOrEmpty(Cfg.CommonJSRoot) && SpindleTree.GetAllFilesPath($@"{rootDirectory}{Cfg.CommonJSRoot}", FileExtensions: [".js"]).Any())
+            {
+                _bundles.SetIsCommonJsActive(true);
+                pipeline.AddCssBundle($"/bundles/common-scripts{extension}js", $"{Cfg.CommonJSRoot.Replace("\\", "/")}/**/*.js");
+            }
+
+
+
         }
 
 
@@ -142,9 +157,24 @@ namespace LayerZero.Tools.Web.Bundles
 
             var extension = Cfg.IsEnvironmentDev ? ".dev." : Cfg.IsMinified ? ".min." : ".";
 
-            pipeline.AddCssBundle($"/bundles/bulk{extension}css", $"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
+            if (_bundles.IsCommonCssActive())
+            {
+                pipeline.AddCssBundle($"/bundles/bulk{extension}css", $"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
+            }
+            else
+            {
+                pipeline.AddCssBundle($"/bundles/bulk{extension}css", $"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
+            }
 
-            pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
+
+            if (_bundles.IsCommonJsActive())
+            {
+                pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CommonJSRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
+            }
+            else
+            {
+                pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
+            }
         }
     }
 }
