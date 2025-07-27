@@ -1,0 +1,50 @@
+﻿@* @inject LayerZero.Tools.Web.Services.Bundles.BundleCollection _collection
+
+@{
+    var resources = _collection.AllResources();
+}
+ *@
+
+
+<h2>ALL Resources</h2>
+
+<pre><code>
+    <!-- Razor code -->
+    @Html.Raw(Html.Encode("<bundle-benchmark-loader/>"))
+</code></pre>
+
+<bundle-benchmark-loader/>
+
+<hr />
+
+<h2> ALL CSS ONLY</h2>
+<pre><code>
+    <!-- Razor code -->
+    @Html.Raw(Html.Encode("<bundle-benchmark-loader type=\"css\" />"))
+</code></pre>
+
+<bundle-benchmark-loader type="css" />
+
+<hr />
+
+<h2> ALL JS ONLY</h2>
+<pre><code>
+    <!-- Razor code -->
+    @Html.Raw(Html.Encode("<bundle-benchmark-loader type=\"js\" />"))
+</code></pre>
+
+<bundle-benchmark-loader type="js" />
+
+<hr />
+
+
+<h2> CSS / JS on Home</h2>
+<pre><code>
+    <!-- Razor code -->
+    @Html.Raw(Html.Encode("<bundle-benchmark-loader filter=\"Home\" type=\"css, js\" />"))
+</code></pre>
+
+<bundle-benchmark-loader filter="Home" type="css,js" />
+
+<hr />
+

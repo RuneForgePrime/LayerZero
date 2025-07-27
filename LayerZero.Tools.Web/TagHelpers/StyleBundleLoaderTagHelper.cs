@@ -29,21 +29,23 @@ namespace LayerZero.Tools.Web.TagHelpers
             var controller = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLowerInvariant();
             var action = ViewContext.RouteData.Values["action"]?.ToString()?.ToLowerInvariant();
 
+            var extension = _bundleRegistry.GetExtension();
+
             output.TagName = null;
 
             if (controller == null) return;
 
             string html = string.Empty;
             var cacheBusting = string.Empty;
-            if(_bundleRegistry.IsDev())
+            if(_bundleRegistry.IsCacheBustingActive())
                 cacheBusting = $"?v={Guid.NewGuid().ToString()}";
 
 
             if (_bundleRegistry.IsCssBundleRegistered(controller))
-                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}.min.css{cacheBusting}\" />";
+                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}{extension}css{cacheBusting}\" />";
 
             if (_bundleRegistry.IsCssBundleRegistered(controller, action))
-                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}/{action}.min.css{cacheBusting}\" />";
+                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}/{action}{extension}css{cacheBusting}\" />";
 
             if (!string.IsNullOrEmpty(html))
             {

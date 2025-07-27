@@ -14,7 +14,10 @@ namespace LayerZero.Tools.Web.Services.Bundles
 
         private string _criticalCss = string.Empty;
         private string _criticalJs = string.Empty;
-        private bool _isDev = false;
+        private bool _isCacheBustingActive = false;
+        private bool _isBulkActive = false;
+        private bool _isDevEnv = false;
+        private bool _isMinified = false;
 
         public void RegisterJsBundle(string Controller, string? Action = null)
         {
@@ -22,13 +25,11 @@ namespace LayerZero.Tools.Web.Services.Bundles
             this._bundlesJs.Add(path);
         }
 
-
         public void RegisterCssBundle(string Controller, string? Action = null)
         {
             var path = !string.IsNullOrEmpty(Action) ? $"{Controller}/{Action}" : Controller;
             this._bundlesCss.Add(path);
         }
-
 
         public bool IsJsBundleRegistered(string Controller, string? Action = null)
         {
@@ -56,12 +57,25 @@ namespace LayerZero.Tools.Web.Services.Bundles
 
         public string GetCriticalJs() => this._criticalJs;
 
-        public void SetEnv(bool IsDevelopment)
+        public void SetCacheBusting(bool IsCacheBustingActive)
         {
-            this._isDev = IsDevelopment;
+            this._isCacheBustingActive = IsCacheBustingActive;
         }
 
+        public bool IsCacheBustingActive() => this._isCacheBustingActive;
 
-        public bool IsDev() => this._isDev;
+        public void SetBulkMode(bool IsBulkActive) => _isBulkActive = IsBulkActive;
+
+        public bool IsBulkActive() => this._isBulkActive;
+
+        public HashSet<string> GetAllCss() => this._bundlesCss;
+
+        public HashSet<string?> GetAllJs() => this._bundlesJs;
+
+        public void SetIsDevEnv(bool IsDevEnv) => this._isDevEnv = IsDevEnv;
+
+        public void SetIsMinified(bool IsMinified) => this._isMinified = IsMinified;
+
+        public string GetExtension() => _isDevEnv ? ".dev." : _isMinified ? ".min." : ".";
     }
 }
