@@ -143,7 +143,7 @@ namespace LayerZero.Tools.Web.Bundles
             if (!string.IsNullOrEmpty(Cfg.CommonJSRoot) && SpindleTree.GetAllFilesPath($@"{rootDirectory}{Cfg.CommonJSRoot}", FileExtensions: [".js"]).Any())
             {
                 _bundles.SetIsCommonJsActive(true);
-                pipeline.AddCssBundle($"/bundles/common-scripts{extension}js", $"{Cfg.CommonJSRoot.Replace("\\", "/")}/**/*.js");
+                pipeline.AddJavaScriptBundle($"/bundles/common-scripts{extension}js", $"{Cfg.CommonJSRoot.Replace("\\", "/")}/**/*.js");
             }
 
 
