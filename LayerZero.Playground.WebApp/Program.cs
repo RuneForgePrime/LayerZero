@@ -13,6 +13,8 @@ builder.Services.AddDynamicBundle(new LayerZero.Tools.Web.Configuration.BundleCo
     EnableBenchmark = true,
     IsEnvironmentDev = false,
     IsMinified = true,
+    CommonCssRoot = null,
+    CommonJSRoot = null
 });
 
 var app = builder.Build();
