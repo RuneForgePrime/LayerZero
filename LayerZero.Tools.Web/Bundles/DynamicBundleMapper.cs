@@ -4,11 +4,7 @@ using LayerZero.Tools.Web.Configuration;
 using LayerZero.Tools.Web.Parser;
 using LayerZero.Tools.Web.Services.Bundles;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using WebOptimizer;
 
 namespace LayerZero.Tools.Web.Bundles
@@ -47,7 +43,7 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
                     _bundles.RegisterJsBundle(nodes[0]);
 
-                    if(Cfg.EnableCacheBusting)
+                    if(Cfg.IsMinified)
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}{extension}js", $"{_item}/*.js");
                     else
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}{extension}js", $"{_item}/*.js").MinifyJavaScript();
@@ -58,7 +54,7 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
 
                     _bundles.RegisterJsBundle(nodes[0], nodes[1]);
-                    if (Cfg.EnableCacheBusting)
+                    if (Cfg.IsMinified)
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}js", $"{_item}/**/*.js");
                     else
                         pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}js", $"{_item}/**/*.js").MinifyJavaScript();
@@ -87,7 +83,7 @@ namespace LayerZero.Tools.Web.Bundles
 
                     _bundles.RegisterCssBundle(nodes[0]);
 
-                    if (Cfg.EnableCacheBusting)
+                    if (Cfg.IsMinified)
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}{extension}css", $"{_item}/*.css");
                     else
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}{extension}css", $"{_item}/*.css").MinifyCss();
@@ -98,7 +94,7 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
                     _bundles.RegisterCssBundle(nodes[0], nodes[1]);
 
-                    if (Cfg.EnableCacheBusting)
+                    if (Cfg.IsMinified)
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css");
                     else
                         pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
@@ -133,20 +129,26 @@ namespace LayerZero.Tools.Web.Bundles
             if (!string.IsNullOrEmpty(criticalJs.ToString()))
                 _bundles.SetCriticalJs(criticalJs.ToString());
 
-            if(!string.IsNullOrEmpty(Cfg.CommonCssRoot) && SpindleTree.GetAllFilesPath($@"{rootDirectory}{Cfg.CommonCssRoot}", FileExtensions: [".css"]).Any())
+            var rootFolderCommonJs = $@"{rootDirectory}/{Cfg.CommonJsRoot}";
+            if(SpindleTreeGuard.IsDirectoryEmpty(rootFolderCommonJs, SearchOption.AllDirectories, [".js"]))
             {
-                _bundles.SetIsCommonCssActive(true);
-                pipeline.AddCssBundle($"/bundles/common-styles{extension}css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css");
+                _bundles.SetIsCommonJsAvailable(true);
+                if (Cfg.IsMinified)
+                    pipeline.AddJavaScriptBundle($"/bundles/z-Shared{extension}js", $"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js");
+                else
+                    pipeline.AddJavaScriptBundle($"/bundles/z-Shared{extension}js", $"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
             }
 
 
-            if (!string.IsNullOrEmpty(Cfg.CommonJSRoot) && SpindleTree.GetAllFilesPath($@"{rootDirectory}{Cfg.CommonJSRoot}", FileExtensions: [".js"]).Any())
+            var rootFolderCommonCss = $@"{rootDirectory}/{Cfg.CommonCssRoot}";
+            if (SpindleTreeGuard.IsDirectoryEmpty(rootFolderCommonCss, SearchOption.AllDirectories, [".js"]))
             {
-                _bundles.SetIsCommonJsActive(true);
-                pipeline.AddJavaScriptBundle($"/bundles/common-scripts{extension}js", $"{Cfg.CommonJSRoot.Replace("\\", "/")}/**/*.js");
+                _bundles.SetIsCommonCssAvailable(true);
+                if (Cfg.IsMinified)
+                    pipeline.AddCssBundle($"/bundles/z-Shared{extension}css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css");
+                else
+                    pipeline.AddCssBundle($"/bundles/z-Shared{extension}css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
             }
-
-
 
         }
 
@@ -157,7 +159,7 @@ namespace LayerZero.Tools.Web.Bundles
 
             var extension = Cfg.IsEnvironmentDev ? ".dev." : Cfg.IsMinified ? ".min." : ".";
 
-            if (_bundles.IsCommonCssActive())
+            if (_bundles.IsBulkActive())
             {
                 pipeline.AddCssBundle($"/bundles/bulk{extension}css", $"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css").MinifyCss();
             }
@@ -167,9 +169,9 @@ namespace LayerZero.Tools.Web.Bundles
             }
 
 
-            if (_bundles.IsCommonJsActive())
+            if (_bundles.IsBulkActive())
             {
-                pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CommonJSRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
+                pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", $"{Cfg.JsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CriticalJsRoot.Replace("\\", "/")}/**/*.js", $"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js").MinifyJavaScript();
             }
             else
             {

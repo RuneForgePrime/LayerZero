@@ -2,12 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using NUglify.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LayerZero.Tools.Web.TagHelpers
 {
@@ -53,6 +47,10 @@ namespace LayerZero.Tools.Web.TagHelpers
                 {
                     links.Add(@$"/bundles/bulk{extension}css");
                 }
+
+                if(_bundleRegistry.IsCommonCssAvailable() && Filter is null)
+                    links.Add(@$"/bundles/z-Shared{extension}css");
+
                 _bundleRegistry.GetAllCss()
                     .Where(css => Match(css))
                     .ToList()
@@ -68,6 +66,9 @@ namespace LayerZero.Tools.Web.TagHelpers
                 {
                     links.Add(@$"/bundles/bulk{extension}js");
                 }
+
+                if (_bundleRegistry.IsCommonJsAvailable() && Filter is null)
+                    links.Add(@$"/bundles/z-Shared{extension}js");
 
                 _bundleRegistry.GetAllJs()
                     .Where(js => Match(js))
