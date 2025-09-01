@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace LayerZero.Tools.Web.Services.Bundles
 {
     public class BundleCollection
@@ -18,6 +13,8 @@ namespace LayerZero.Tools.Web.Services.Bundles
         private bool _isBulkActive = false;
         private bool _isDevEnv = false;
         private bool _isMinified = false;
+        private bool _isCommonJsAvailable = false;
+        private bool _isCommonCssAvailable = false;
 
         public void RegisterJsBundle(string Controller, string? Action = null)
         {
@@ -54,6 +51,12 @@ namespace LayerZero.Tools.Web.Services.Bundles
         {
             this._criticalJs  = Scripts;
         }
+
+        public void SetIsCommonJsAvailable(bool IsCommonJsAvailable) => _isCommonJsAvailable = IsCommonJsAvailable;
+        public void SetIsCommonCssAvailable(bool IsCommonCssAvailable) => _isCommonCssAvailable = IsCommonCssAvailable;
+
+        public bool IsCommonJsAvailable() => _isCommonJsAvailable;
+        public bool IsCommonCssAvailable() => _isCommonCssAvailable;
 
         public string GetCriticalJs() => this._criticalJs;
 

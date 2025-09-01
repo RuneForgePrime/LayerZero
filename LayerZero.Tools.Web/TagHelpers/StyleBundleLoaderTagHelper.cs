@@ -2,11 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LayerZero.Tools.Web.TagHelpers
 {
@@ -39,6 +34,10 @@ namespace LayerZero.Tools.Web.TagHelpers
             var cacheBusting = string.Empty;
             if(_bundleRegistry.IsCacheBustingActive())
                 cacheBusting = $"?v={Guid.NewGuid().ToString()}";
+
+
+            if(_bundleRegistry.IsCommonCssAvailable())
+                html += $"<link rel=\"stylesheet\" href=\"/bundles/z-Shared{extension}css{cacheBusting}\" />";
 
 
             if (_bundleRegistry.IsCssBundleRegistered(controller))
