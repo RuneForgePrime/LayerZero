@@ -19,10 +19,15 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageIcon>Icon/logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Icon\**" />
+    <EmbeddedResource Remove="Icon\**" />
+    <None Remove="Icon\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AngleSharp.Css" Version="0.17.0" />
@@ -35,9 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Icon/logo.png" Pack="true" PackagePath="Icon/">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="README.md" Pack="true" PackagePath="">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
