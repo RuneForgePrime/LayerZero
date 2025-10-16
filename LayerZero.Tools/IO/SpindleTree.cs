@@ -30,5 +30,30 @@ namespace LayerZero.Tools.IO
 
             return files.Where(file => FileExtensions.Any(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).ToList();
         }
+
+        public static IEnumerable<(string Path, int Depth)> GetDirectories(string RootPath, int MaxDepth = 2, int CurrentDepth = 1)
+        {
+            if (CurrentDepth > MaxDepth)
+                yield break;
+
+            string[] subFolders;
+
+            try
+            {
+                subFolders = Directory.GetDirectories(RootPath, "*", SearchOption.AllDirectories);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                yield break;
+            }
+
+            foreach (var folder in subFolders)
+            {
+                yield return (folder, CurrentDepth);
+
+                foreach (var sub in GetDirectories(folder, MaxDepth, CurrentDepth + 1))
+                    yield return sub;
+            }
+        }
     }
 }

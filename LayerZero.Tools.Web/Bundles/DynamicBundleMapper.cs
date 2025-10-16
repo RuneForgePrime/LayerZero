@@ -29,79 +29,73 @@ namespace LayerZero.Tools.Web.Bundles
             var rootDirectory = @"wwwroot/";
 
             var rootFolderJs = @$"{rootDirectory}{Cfg.JsRoot}";
-            var JsFolders = Directory.GetDirectories(rootFolderJs, "*", SearchOption.AllDirectories);
+            var JsFolders = SpindleTree.GetDirectories(rootFolderJs, 2);
 
 
             foreach (var item in JsFolders)
             {
-                var relativePath = item.Replace(rootFolderJs, string.Empty);
-                var nodes = relativePath.Split("\\").Where(s => !string.IsNullOrEmpty(s)).ToList();
-                var _item = item.Replace(rootDirectory, string.Empty).Replace("\\", "/").TrimEnd('/');
-                if (nodes.Count > 2)
+                var relativePath = item.Path.Replace(rootFolderJs, string.Empty);
+                var _item = item.Path.Replace(rootDirectory, string.Empty).Replace("\\", "/").TrimEnd('/');
+                var name = _item.Replace(Cfg.JsRoot, string.Empty).TrimStart('/');
+
+                if (item.Depth == 1)
                 {
-                    continue;
-                }
-                else if (nodes.Count == 1)
-                {
-                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.TopDirectoryOnly, [".js"]))
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.TopDirectoryOnly, [".js"]))
                         continue;
-                    _bundles.RegisterJsBundle(nodes[0]);
+                    _bundles.RegisterJsBundle(name);
 
                     if(Cfg.EnableCacheBusting)
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}{extension}js", $"{_item}/*.js");
+                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/*.js");
                     else
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}{extension}js", $"{_item}/*.js").MinifyJavaScript();
+                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/*.js").MinifyJavaScript();
                 }
                 else
                 {
-                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.AllDirectories, [".js"]))
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.AllDirectories, [".js"]))
                         continue;
 
-                    _bundles.RegisterJsBundle(nodes[0], nodes[1]);
+                    _bundles.RegisterJsBundle(name);
                     if (Cfg.EnableCacheBusting)
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}js", $"{_item}/**/*.js");
+                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/**/*.js");
                     else
-                        pipeline.AddJavaScriptBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}js", $"{_item}/**/*.js").MinifyJavaScript();
+                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/**/*.js").MinifyJavaScript();
                 }
             }
 
 
             var rootFolderCss = @$"{rootDirectory}{Cfg.CssRoot}";
-            var CssFolders = Directory.GetDirectories(rootFolderCss, "*", SearchOption.AllDirectories);
+            var CssFolders = SpindleTree.GetDirectories(rootFolderCss, 2);
 
 
             foreach (var item in CssFolders)
             {
-                var relativePath = item.Replace(rootFolderCss, string.Empty);
-                var nodes = relativePath.Split("\\").Where(s => !string.IsNullOrEmpty(s)).ToList();
-                var _item = item.Replace(rootDirectory, string.Empty).Replace("\\", "/").TrimEnd('/');
-                if (nodes.Count > 2)
-                {
-                    continue;
-                }
-                else if (nodes.Count == 1)
+                var relativePath = item.Path.Replace(rootFolderCss, string.Empty);
+                var _item = item.Path.Replace(rootDirectory, string.Empty).Replace("\\", "/").TrimEnd('/');
+                var name = _item.Replace(Cfg.CssRoot, string.Empty).TrimStart('/');
+
+                if (item.Depth == 1)
                 {
 
-                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.TopDirectoryOnly, [".css"]))
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.TopDirectoryOnly, [".css"]))
                         continue;
 
-                    _bundles.RegisterCssBundle(nodes[0]);
+                    _bundles.RegisterCssBundle(name);
 
                     if (Cfg.EnableCacheBusting)
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}{extension}css", $"{_item}/*.css");
+                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item}/*.css");
                     else
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}{extension}css", $"{_item}/*.css").MinifyCss();
+                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item}/*.css").MinifyCss();
                 }
                 else
                 {
-                    if (SpindleTreeGuard.IsDirectoryEmpty(item, SearchOption.AllDirectories, [".css"]))
+                    if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.AllDirectories, [".css"]))
                         continue;
-                    _bundles.RegisterCssBundle(nodes[0], nodes[1]);
+                    _bundles.RegisterCssBundle(name);
 
                     if (Cfg.EnableCacheBusting)
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css");
+                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css");
                     else
-                        pipeline.AddCssBundle($"/bundles/{nodes[0]}/{nodes[1]}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
+                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
                 }
             }
 
