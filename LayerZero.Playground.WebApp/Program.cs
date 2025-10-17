@@ -14,7 +14,7 @@ builder.Services.AddDynamicBundle(new LayerZero.Tools.Web.Configuration.BundleCo
     IsEnvironmentDev = false,
     IsMinified = true,
     CommonCssRoot = null,
-    CommonJSRoot = null
+    CommonJsRoot = null
 });
 
 var app = builder.Build();
