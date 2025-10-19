@@ -126,15 +126,15 @@ namespace LayerZero.Tools.Web.Bundles
 
             if (!string.IsNullOrEmpty(Cfg.CommonCssRoot) && SpindleTree.GetAllFilesPath($@"{rootDirectory}{Cfg.CommonCssRoot}", FileExtensions: [".css"]).Any())
             {
-                _bundles.SetIsCommonJsAvailable(true);
-                pipeline.AddCssBundle($"/bundles/common-styles{extension}css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css");
+                _bundles.SetIsCommonCssAvailable(true);
+                pipeline.AddCssBundle($"/bundles/z-Shared{extension}css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css");
             }
 
 
             if (!string.IsNullOrEmpty(Cfg.CommonJsRoot) && SpindleTree.GetAllFilesPath($@"{rootDirectory}{Cfg.CommonJsRoot}", FileExtensions: [".js"]).Any())
             {
-                _bundles.SetIsCommonCssAvailable(true);
-                pipeline.AddCssBundle($"/bundles/common-scripts{extension}js", $"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js");
+                _bundles.SetIsCommonJsAvailable(true);
+                pipeline.AddJavaScriptBundle($"/bundles/z-Shared{extension}js", $"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js");
             }
 
         }
