@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - LayerZero.Playground.WebApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/LayerZero.Playground.WebApp.styles.css" asp-append-version="true" />
     <critical-style-bundle-loader/>
     <style-bundle-loader/>
     <style>
@@ -52,7 +50,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <critical-script-bundle-loader />
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script-bundle-loader/>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
