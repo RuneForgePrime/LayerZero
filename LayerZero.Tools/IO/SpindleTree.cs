@@ -33,6 +33,9 @@ namespace LayerZero.Tools.IO
 
         public static IEnumerable<(string Path, int Depth)> GetDirectories(string RootPath, int MaxDepth = 2, int CurrentDepth = 1)
         {
+            if (RootPath == null)
+                yield break;
+
             if (CurrentDepth > MaxDepth)
                 yield break;
 

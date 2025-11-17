@@ -12,6 +12,9 @@ namespace LayerZero.Tools.Guard
 
         public static bool Exists(string DirectoryPath)
         {
+            if (DirectoryPath == null)
+                return false;
+
             DirectoryPath.IsNotNullNorEmptyOrWhiteSpace();
             return Directory.Exists(DirectoryPath);
         }
@@ -22,6 +25,9 @@ namespace LayerZero.Tools.Guard
                                             [CallerArgumentExpression("DirectoryPath")] string sourceExpression = "")
         {
 
+
+            if (DirectoryPath == null)
+                return true;
 
             DirectoryPath.IsNotNullNorEmptyOrWhiteSpace();
             if (!Exists(DirectoryPath))

@@ -12,7 +12,7 @@ builder.Services.AddDynamicBundle(new LayerZero.Tools.Web.Configuration.BundleCo
     EnableCacheBusting = builder.Environment.IsDevelopment(),
     EnableBenchmark = true,
     IsEnvironmentDev = false,
-    IsMinified = true,
+    IsMinified = true
 });
 
 var app = builder.Build();
