@@ -19,7 +19,7 @@ namespace LayerZero.Tools.Guard
             return Directory.Exists(DirectoryPath);
         }
 
-        public static bool IsDirectoryEmpty(string DirectoryPath,
+        public static bool IsDirectoryEmpty(string? DirectoryPath,
                                             SearchOption SearchOption = SearchOption.AllDirectories,
                                             string[]? FileExtensions = null, 
                                             [CallerArgumentExpression("DirectoryPath")] string sourceExpression = "")

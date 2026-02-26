@@ -14,7 +14,7 @@ namespace LayerZero.Tools.IO
 
     public static class SpindleTree
     {
-        public static List<string>? GetAllFilesPath(string DirectoryPath,
+        public static List<string>? GetAllFilesPath(string? DirectoryPath,
                                             SearchOption SearchOption = SearchOption.AllDirectories,
                                             string[]? FileExtensions = null,
                                             [CallerArgumentExpression("DirectoryPath")] string sourceExpression = "")
