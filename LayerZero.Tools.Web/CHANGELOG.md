@@ -3,6 +3,35 @@
 All notable changes to this project are documented in this file.
 
 ---
+
+## [2.1.0] - 2026-05-15
+
+### 🗑 Removed
+
+- **`LigerShark.WebOptimizer.Core`** — eliminated external WebOptimizer dependency.
+  - Replaced with a built-in `BundleStore` (lazy `ConcurrentDictionary` cache) and `BundleServingMiddleware`.
+  - `app.UseWebOptimizer()` → `app.UseBundleServing()`.
+  - `AddDynamicBundle()` signature is unchanged.
+
+- **`AngleSharp.Css`** — removed CSS parser dependency.
+  - Critical CSS is now minified via `NUglify`. Output changes from pretty-printed to minified.
+  - Fallback to raw file content if NUglify produces no output.
+
+- **`Esprima`** — removed JS syntax validator dependency.
+  - JS validation now handled by `NUglify`. Behaviour is identical: valid JS is inlined as-is; files with syntax errors produce a `/* File X Skipped: reason */` comment.
+
+### 🛠 Improvements
+
+- `LayerZero.Tools.Web` is now fully self-contained — only `NUglify` and the ASP.NET Core framework reference are required.
+- Bundle serving no longer depends on any third-party middleware pipeline.
+
+### ⚠️ Breaking Changes
+
+- `app.UseWebOptimizer()` must be replaced with `app.UseBundleServing()`.
+- Critical CSS output format changed from indented/pretty-printed to NUglify-minified.
+
+---
+
 ## [1.3.0] - 2025-07-06
 
 ### ✨ Added
