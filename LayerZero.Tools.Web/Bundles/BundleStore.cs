@@ -9,8 +9,11 @@ namespace LayerZero.Tools.Web.Bundles
 {
     public class BundleStore : IBundleBuilder
     {
+        private readonly string _webRootPath;
         private readonly ConcurrentDictionary<string, BundleDescriptor> _descriptors = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, CachedBundle> _contentCache = new(StringComparer.OrdinalIgnoreCase);
+
+        public BundleStore(string webRootPath) => _webRootPath = webRootPath;
 
         public void RegisterBundle(string route, string[] sourceGlobs, BundleType type, bool minify)
         {
@@ -32,18 +35,17 @@ namespace LayerZero.Tools.Web.Bundles
 
         public bool IsRegistered(string route) => _descriptors.ContainsKey(route);
 
-        private static CachedBundle Build(BundleDescriptor descriptor)
+        private CachedBundle Build(BundleDescriptor descriptor)
         {
-            var wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             var raw = new StringBuilder();
 
             var matcher = new Matcher();
             foreach (var glob in descriptor.Globs)
                 matcher.AddInclude(glob);
 
-            var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(wwwroot)));
+            var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(_webRootPath)));
             foreach (var file in result.Files.OrderBy(f => f.Path))
-                raw.AppendLine(File.ReadAllText(Path.Combine(wwwroot, file.Path)));
+                raw.AppendLine(File.ReadAllText(Path.Combine(_webRootPath, file.Path)));
 
             var content = raw.ToString();
 
