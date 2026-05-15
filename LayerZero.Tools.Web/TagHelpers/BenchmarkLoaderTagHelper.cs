@@ -10,10 +10,10 @@ namespace LayerZero.Tools.Web.TagHelpers
     public class BenchmarkLoaderTagHelper : TagHelper
     {
         [HtmlAttributeName("filter")]
-        public string Filter { get; set; }
+        public string? Filter { get; set; }
 
         [HtmlAttributeName("type")]
-        public string AssetType { get; set; } // css, js, or both (null)
+        public string? AssetType { get; set; } // css, js, or both (null)
 
         private readonly BundleCollection _bundleRegistry;
         public BenchmarkLoaderTagHelper(BundleCollection bundleRegistry)
@@ -27,7 +27,7 @@ namespace LayerZero.Tools.Web.TagHelpers
 
         [ViewContext]
         [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        public ViewContext ViewContext { get; set; } = null!;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
