@@ -1,23 +1,21 @@
-﻿# 📦 Dynamic Bundle Loader for ASP.NET Core
+# 📦 Dynamic Bundle Loader for ASP.NET Core
 [![NuGet](https://img.shields.io/nuget/v/LayerZero.Tools.Web.svg)](https://www.nuget.org/packages/LayerZero.Tools.Web)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/LayerZero.Tools.Web.svg)](https://www.nuget.org/packages/LayerZero.Tools.Web)
 ![.NET](https://img.shields.io/badge/.NET-8.0-blue)
 
 ---
 
-A convention-based asset bundling system for .NET 8+ using WebOptimizer. Automatically discovers and injects CSS/JS bundles per controller and action using Razor TagHelpers.
+A convention-based asset bundling system for .NET 8+ with zero external framework dependencies. Automatically discovers and injects CSS/JS bundles per controller and action using Razor TagHelpers.
 
-> 🧩 Not a full framework.\
-> ❌ Doesn’t replace WebOptimizer.\
-> ✅ Enhances it with dynamic discovery, layout scoping, and critical asset control.
+> 🧩 No WebOptimizer required.\
+> ✅ Self-contained bundle serving with built-in middleware.\
+> ✅ NUglify-powered minification and CSS/JS validation.
 
 ---
 
 ## 🔍 Purpose
 
-
 Eliminates manual asset management in Razor views by scanning controller/action folder structures and auto-generating optimized bundles at runtime.
-
 
 ---
 
@@ -69,7 +67,6 @@ wwwroot/
  - A special folder for `critical CSS` (`wwwroot/css/critical`)
  - A special folder for `critical JS` (`wwwroot/js/critical`)
 
-
 ---
 
 ## ⚙️ Installation
@@ -83,17 +80,15 @@ dotnet add package LayerZero.Tools.Web
 Or reference the project directly:
 
 ```bash
-dotnet new classlib -n LayerZero.Tools.Web
 dotnet add reference ../LayerZero.Tools.Web/LayerZero.Tools.Web.csproj
 ```
 
-### 2. NuGet Dependencies
+### 2. Dependencies
 
-```xml
-<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.456" />
-<PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.456" />
-<FrameworkReference Include="LayerZero.Tools" Version="1.0.1"/>
-```
+No external NuGet packages are required in your application. `LayerZero.Tools.Web` uses only:
+
+- `NUglify` (bundled — CSS/JS minification and validation)
+- `Microsoft.AspNetCore.App` framework reference
 
 ---
 
@@ -111,11 +106,10 @@ Or if you want to enable cache-busting on dev environment:
 builder.Services.AddDynamicBundle(builder.Environment);
 ```
 
-
 ### Enable Middleware
 
 ```csharp
-app.UseWebOptimizer();
+app.UseBundleServing();
 ```
 
 ---
@@ -153,19 +147,18 @@ app.UseWebOptimizer();
 ✅ Controller & action bundle granularity\
 ✅ TagHelpers for clean layout injection\
 ✅ Auto-registers bundles at startup\
-✅ Inline critical CSS\
-✅ Inline critical JS\
-✅ Cache-busting in development mode
+✅ Inline critical CSS (NUglify-minified)\
+✅ Inline critical JS (NUglify-validated)\
+✅ Cache-busting in development mode\
+✅ Zero external framework dependencies
 
 ---
 
 ## ⚠️ Known Limitations
 
-- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()` same as `v1.1.0`.
+- ❌ **Custom asset folder paths** are *not* configurable via `AddDynamicBundle()`.
 - ❌ **Dynamic runtime configuration** of asset logic is not exposed yet.
 - ✅ A static convention-based pathing system is in place (e.g., `wwwroot/css/Controller/Action/...`).
-
-These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
 
 ---
 
@@ -173,6 +166,9 @@ These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
 
 - Combines all `.css` files under `wwwroot/css/critical/` into a single `<style>` tag.
 - Injected above all other stylesheets.
+- CSS is minified via NUglify. If a file cannot be parsed at all, raw content is used as fallback.
+
+> **Note:** Critical CSS is also accessible as a plain HTTP route at `/bundles/z-Critical.css` (or `/bundles/z-Critical.min.css` when minification is enabled). This endpoint is served with full caching headers and can be useful for debugging or inspecting the inlined content.
 
 ---
 
@@ -180,13 +176,29 @@ These constraints persist in `v1.2.0` and will be addressed in `v2.0.0`.
 
 - Combines all `.js` files under `wwwroot/js/critical/` into one `<script>` tag.
 - Injected **before** all other scripts for optimal early execution.
-- In `v1.2.0`, scripts are injected as-is — no syntax validation or dependency analysis is performed yet.
+- JS is validated via NUglify. Files with syntax errors are skipped with a `/* File X Skipped: reason */` comment in their place.
+
+> **Note:** Critical JS is also accessible as a plain HTTP route at `/bundles/z-Critical.js` (or `/bundles/z-Critical.min.js`). Same as for Critical CSS — useful for inspection, not intended as the primary delivery mechanism.
+
+---
+
+## 🆕 What's New in v2.1.0
+
+### Removed external parser dependencies
+
+`LayerZero.Tools.Web` is now fully self-contained:
+
+- **Removed `LigerShark.WebOptimizer.Core`** — replaced with a built-in `BundleStore` (lazy `ConcurrentDictionary` cache) and `BundleServingMiddleware`. Update `app.UseWebOptimizer()` → `app.UseBundleServing()`.
+- **Removed `AngleSharp.Css`** — CSS parsing and formatting replaced with `NUglify`. Critical CSS is now minified inline rather than pretty-printed.
+- **Removed `Esprima`** — JS syntax validation replaced with `NUglify`. Behaviour is identical: valid JS is inlined as-is; invalid JS produces a skip comment.
+
+> **Migration note:** Replace `app.UseWebOptimizer()` with `app.UseBundleServing()` in your `Program.cs`.
 
 ---
 
 ## 🆕 What's New in v1.3.0
 
-LayerZero.Tools.Web now includes **Critical JavaScript** support:
+LayerZero.Tools.Web added **Critical JavaScript** support:
 
 - Place scripts in `wwwroot/js/critical/`
 - Files are parsed and rendered inline, **before all standard JS bundles**
@@ -194,9 +206,7 @@ LayerZero.Tools.Web now includes **Critical JavaScript** support:
 
 > Critical JS handling mirrors Critical CSS introduced in `v1.2.0`, forming a complete early asset delivery strategy.
 
-
 ---
-
 
 ## 🚫 Cache-Busting in Development
 
@@ -225,9 +235,7 @@ Requesting `/Home/Index` loads:
 
 ---
 
-## 🛣 Planned for v2.0.0
-
-A new configuration object will be introduced to allow:
+## 🛣 Upcoming
 
 - ✅ Custom `JsRoot`, `CssRoot`, `CriticalCssRoot` directories.
 - ✅ Optional feature toggles for minification, cache-busting, critical asset control.

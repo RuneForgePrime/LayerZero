@@ -16,6 +16,7 @@ namespace LayerZero.Tools.Web.Bundles
         private readonly ConcurrentDictionary<string, BundleDescriptor> _descriptors = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, CachedBundle> _contentCache = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<FileSystemWatcher> _watchers = new();
+        private int _watchersStarted = 0;
 
         public BundleStore(string webRootPath, ILogger<BundleStore>? logger = null)
         {
@@ -25,6 +26,7 @@ namespace LayerZero.Tools.Web.Bundles
 
         public void StartWatchers()
         {
+            if (Interlocked.CompareExchange(ref _watchersStarted, 1, 0) != 0) return;
             if (!Directory.Exists(_webRootPath)) return;
 
             var dirToRoutes = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
@@ -90,6 +92,8 @@ namespace LayerZero.Tools.Web.Bundles
 
         public bool TryGetOrBuild(string route, out CachedBundle bundle)
         {
+            if (_watchersStarted == 0) StartWatchers();
+
             if (_contentCache.TryGetValue(route, out bundle!))
                 return true;
 
