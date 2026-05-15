@@ -38,10 +38,13 @@ namespace LayerZero.Tools.Web.Middleware
             await context.Response.WriteAsync(bundle.Content);
         }
     }
+}
 
+namespace LayerZero.Tools.Web.Extensions
+{
     public static class BundleServingMiddlewareExtensions
     {
         public static IApplicationBuilder UseBundleServing(this IApplicationBuilder app)
-            => app.UseMiddleware<BundleServingMiddleware>();
+            => app.UseMiddleware<LayerZero.Tools.Web.Middleware.BundleServingMiddleware>();
     }
 }

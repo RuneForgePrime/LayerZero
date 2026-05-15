@@ -1,7 +1,6 @@
 
 
 using LayerZero.Tools.Web.Extensions;
-using LayerZero.Tools.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
