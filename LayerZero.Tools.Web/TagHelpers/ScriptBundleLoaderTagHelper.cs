@@ -1,4 +1,5 @@
-﻿using LayerZero.Tools.Web.Services.Bundles;
+﻿using LayerZero.Tools.Web.Bundles;
+using LayerZero.Tools.Web.Services.Bundles;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -9,15 +10,25 @@ namespace LayerZero.Tools.Web.TagHelpers
     public class ScriptBundleLoaderTagHelper : TagHelper
     {
         private readonly BundleCollection _bundleRegistry;
+        private readonly BundleStore _store;
 
-        public ScriptBundleLoaderTagHelper(BundleCollection bundleRegistry)
+        public ScriptBundleLoaderTagHelper(BundleCollection bundleRegistry, BundleStore store)
         {
             _bundleRegistry = bundleRegistry;
+            _store = store;
         }
 
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
+
+        private string CacheBust(string route)
+        {
+            if (!_bundleRegistry.IsCacheBustingActive()) return string.Empty;
+            return _store.TryGetOrBuild(route, out var bundle)
+                ? $"?v={bundle.ETag.Trim('"')}"
+                : string.Empty;
+        }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -31,24 +42,27 @@ namespace LayerZero.Tools.Web.TagHelpers
             if (controller == null) return;
 
             string html = string.Empty;
-            var cacheBusting = string.Empty;
-            if (_bundleRegistry.IsCacheBustingActive())
-                cacheBusting = $"?v={Guid.NewGuid().ToString()}";
-
 
             if (_bundleRegistry.IsCommonJsAvailable())
-                html += $"<script src=\"/bundles/z-Shared{extension}js{cacheBusting}\"></script>";
+            {
+                var route = $"/bundles/z-Shared{extension}js";
+                html += $"<script src=\"{route}{CacheBust(route)}\"></script>";
+            }
 
             if (_bundleRegistry.IsJsBundleRegistered(controller))
-                html += $"<script src=\"/bundles/{controller}{extension}js{cacheBusting}\"></script>";
+            {
+                var route = $"/bundles/{controller}{extension}js";
+                html += $"<script src=\"{route}{CacheBust(route)}\"></script>";
+            }
 
             if (_bundleRegistry.IsJsBundleRegistered(controller, action))
-                html += $"<script src=\"/bundles/{controller}/{action}{extension}js{cacheBusting}\"></script>";
+            {
+                var route = $"/bundles/{controller}/{action}{extension}js";
+                html += $"<script src=\"{route}{CacheBust(route)}\"></script>";
+            }
 
             if (!string.IsNullOrEmpty(html))
-            {
                 output.Content.SetHtmlContent(html);
-            }
         }
     }
 }

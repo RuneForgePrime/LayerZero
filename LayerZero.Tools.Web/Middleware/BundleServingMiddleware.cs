@@ -32,6 +32,13 @@ namespace LayerZero.Tools.Web.Middleware
                 return;
             }
 
+            var ifNoneMatch = context.Request.Headers.IfNoneMatch.ToString();
+            if (!string.IsNullOrEmpty(ifNoneMatch) && ifNoneMatch == bundle.ETag)
+            {
+                context.Response.StatusCode = 304;
+                return;
+            }
+
             context.Response.ContentType = bundle.ContentType;
             context.Response.Headers.ETag = bundle.ETag;
             context.Response.Headers.CacheControl = "public,max-age=31536000";

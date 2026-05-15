@@ -1,4 +1,5 @@
-﻿using LayerZero.Tools.Web.Services.Bundles;
+﻿using LayerZero.Tools.Web.Bundles;
+using LayerZero.Tools.Web.Services.Bundles;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -9,15 +10,25 @@ namespace LayerZero.Tools.Web.TagHelpers
     public class StyleBundleLoaderTagHelper : TagHelper
     {
         private readonly BundleCollection _bundleRegistry;
+        private readonly BundleStore _store;
 
-        public StyleBundleLoaderTagHelper(BundleCollection bundleRegistry)
+        public StyleBundleLoaderTagHelper(BundleCollection bundleRegistry, BundleStore store)
         {
             _bundleRegistry = bundleRegistry;
+            _store = store;
         }
 
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
+
+        private string CacheBust(string route)
+        {
+            if (!_bundleRegistry.IsCacheBustingActive()) return string.Empty;
+            return _store.TryGetOrBuild(route, out var bundle)
+                ? $"?v={bundle.ETag.Trim('"')}"
+                : string.Empty;
+        }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -31,25 +42,27 @@ namespace LayerZero.Tools.Web.TagHelpers
             if (controller == null) return;
 
             string html = string.Empty;
-            var cacheBusting = string.Empty;
-            if(_bundleRegistry.IsCacheBustingActive())
-                cacheBusting = $"?v={Guid.NewGuid().ToString()}";
 
-
-            if(_bundleRegistry.IsCommonCssAvailable())
-                html += $"<link rel=\"stylesheet\" href=\"/bundles/z-Shared{extension}css{cacheBusting}\" />";
-
+            if (_bundleRegistry.IsCommonCssAvailable())
+            {
+                var route = $"/bundles/z-Shared{extension}css";
+                html += $"<link rel=\"stylesheet\" href=\"{route}{CacheBust(route)}\" />";
+            }
 
             if (_bundleRegistry.IsCssBundleRegistered(controller))
-                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}{extension}css{cacheBusting}\" />";
+            {
+                var route = $"/bundles/{controller}{extension}css";
+                html += $"<link rel=\"stylesheet\" href=\"{route}{CacheBust(route)}\" />";
+            }
 
             if (_bundleRegistry.IsCssBundleRegistered(controller, action))
-                html += $"<link rel=\"stylesheet\" href=\"/bundles/{controller}/{action}{extension}css{cacheBusting}\" />";
+            {
+                var route = $"/bundles/{controller}/{action}{extension}css";
+                html += $"<link rel=\"stylesheet\" href=\"{route}{CacheBust(route)}\" />";
+            }
 
             if (!string.IsNullOrEmpty(html))
-            {
                 output.Content.SetHtmlContent(html);
-            }
         }
     }
 }
