@@ -9,18 +9,50 @@ using System.Text;
 
 namespace LayerZero.Tools.Web.Bundles
 {
-    public class BundleStore : IBundleBuilder
+    public class BundleStore : IBundleBuilder, IDisposable
     {
         private readonly string _webRootPath;
         private readonly ILogger<BundleStore> _logger;
         private readonly ConcurrentDictionary<string, BundleDescriptor> _descriptors = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, CachedBundle> _contentCache = new(StringComparer.OrdinalIgnoreCase);
+        private readonly FileSystemWatcher? _watcher;
 
         public BundleStore(string webRootPath, ILogger<BundleStore>? logger = null)
         {
             _webRootPath = webRootPath;
             _logger = logger ?? NullLogger<BundleStore>.Instance;
+            if (Directory.Exists(webRootPath))
+                _watcher = StartWatcher();
         }
+
+        private FileSystemWatcher StartWatcher()
+        {
+            var watcher = new FileSystemWatcher(_webRootPath)
+            {
+                IncludeSubdirectories = true,
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
+                EnableRaisingEvents = true
+            };
+            watcher.Changed += OnFileChanged;
+            watcher.Created += OnFileChanged;
+            watcher.Renamed += (s, e) => OnFileChanged(s, e);
+            return watcher;
+        }
+
+        private void OnFileChanged(object sender, FileSystemEventArgs e)
+        {
+            var relativePath = Path.GetRelativePath(_webRootPath, e.FullPath).Replace('\\', '/');
+            foreach (var (route, descriptor) in _descriptors)
+            {
+                var matcher = new Matcher();
+                foreach (var glob in descriptor.Globs)
+                    matcher.AddInclude(glob);
+                if (matcher.Match(relativePath).HasMatches && _contentCache.TryRemove(route, out _))
+                    _logger.LogInformation("Bundle cache evicted: {Route} (file changed: {File})", route, relativePath);
+            }
+        }
+
+        public void Dispose() => _watcher?.Dispose();
 
         public void RegisterBundle(string route, string[] sourceGlobs, BundleType type, bool minify)
         {
