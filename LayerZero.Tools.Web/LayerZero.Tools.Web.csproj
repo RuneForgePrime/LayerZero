@@ -34,8 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp.Css" Version="0.17.0" />
-    <PackageReference Include="Esprima" Version="3.0.5" />
     <PackageReference Include="NUglify" Version="1.21.9" />
   </ItemGroup>
 
