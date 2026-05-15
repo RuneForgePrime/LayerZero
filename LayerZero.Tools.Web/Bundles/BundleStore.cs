@@ -44,7 +44,16 @@ namespace LayerZero.Tools.Web.Bundles
 
             var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(_webRootPath)));
             foreach (var file in result.Files.OrderBy(f => f.Path))
-                raw.AppendLine(File.ReadAllText(Path.Combine(_webRootPath, file.Path)));
+            {
+                try
+                {
+                    raw.AppendLine(File.ReadAllText(Path.Combine(_webRootPath, file.Path)));
+                }
+                catch (IOException)
+                {
+                    // file disappeared or is unreadable between glob resolution and read; skip
+                }
+            }
 
             var content = raw.ToString();
 
