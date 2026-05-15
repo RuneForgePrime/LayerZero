@@ -1,5 +1,7 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUglify;
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
@@ -10,10 +12,15 @@ namespace LayerZero.Tools.Web.Bundles
     public class BundleStore : IBundleBuilder
     {
         private readonly string _webRootPath;
+        private readonly ILogger<BundleStore> _logger;
         private readonly ConcurrentDictionary<string, BundleDescriptor> _descriptors = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, CachedBundle> _contentCache = new(StringComparer.OrdinalIgnoreCase);
 
-        public BundleStore(string webRootPath) => _webRootPath = webRootPath;
+        public BundleStore(string webRootPath, ILogger<BundleStore>? logger = null)
+        {
+            _webRootPath = webRootPath;
+            _logger = logger ?? NullLogger<BundleStore>.Instance;
+        }
 
         public void RegisterBundle(string route, string[] sourceGlobs, BundleType type, bool minify)
         {
@@ -64,7 +71,16 @@ namespace LayerZero.Tools.Web.Bundles
                     : Uglify.Js(content);
 
                 if (!minified.HasErrors)
+                {
                     content = minified.Code;
+                }
+                else
+                {
+                    var errors = string.Join("\n", minified.Errors.Select(e => $"   - {e.Message}"));
+                    content = $"/* LayerZero: minification failed — serving raw content\n{errors}\n*/\n{content}";
+                    _logger.LogWarning("Bundle minification failed for descriptor with {ErrorCount} error(s):\n{Errors}",
+                        minified.Errors.Count, errors);
+                }
             }
 
             var contentType = descriptor.Type == BundleType.Css

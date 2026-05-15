@@ -2,6 +2,7 @@ using LayerZero.Tools.Web.Bundles;
 using LayerZero.Tools.Web.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace LayerZero.Tools.Web.Extensions
 {
@@ -14,7 +15,8 @@ namespace LayerZero.Tools.Web.Extensions
             Services.AddSingleton(sp =>
             {
                 var env = sp.GetRequiredService<IWebHostEnvironment>();
-                var store = new BundleStore(env.WebRootPath);
+                var logger = sp.GetService<ILogger<BundleStore>>();
+                var store = new BundleStore(env.WebRootPath, logger);
                 DynamicBundleMapper.Register(store, Config);
                 if (Config.EnableBenchmark)
                     DynamicBundleMapper.RegisterBulk(store, Config);
