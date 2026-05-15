@@ -88,6 +88,7 @@ namespace LayerZero.Tools.Web.Bundles
         public void RegisterBundle(string route, string[] sourceGlobs, BundleType type, bool minify)
         {
             _descriptors[route] = new BundleDescriptor(sourceGlobs, type, minify);
+            _contentCache.TryRemove(route, out _);
         }
 
         public bool TryGetOrBuild(string route, out CachedBundle bundle)
