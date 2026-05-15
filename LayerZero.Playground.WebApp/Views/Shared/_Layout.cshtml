@@ -26,10 +26,19 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Benchmark" asp-action="Index">Benchmark</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">Docs</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Docs" asp-action="Introduction">Introduction</a></li>
+                                <li><a class="dropdown-item" asp-controller="Docs" asp-action="Setup">Setup</a></li>
+                                <li><a class="dropdown-item" asp-controller="Docs" asp-action="Configuration">Configuration</a></li>
+                                <li><a class="dropdown-item" asp-controller="Docs" asp-action="Benchmark">Benchmark</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="Docs" asp-action="ChangeLogs">Changelog</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

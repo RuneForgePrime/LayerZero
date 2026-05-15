@@ -1,0 +1,165 @@
+@{
+    ViewData["Title"] = "Configuration — LayerZero.Tools.Web";
+}
+
+<div class="docs-wrapper">
+    <aside class="docs-sidebar">
+        @await Html.PartialAsync("_DocsSidebar")
+    </aside>
+
+    <div class="docs-content">
+        <h1>Configuration</h1>
+        <p class="page-subtitle">All options are passed via <code>BundleCollectionConfig</code> when calling <code>AddDynamicBundle()</code>.</p>
+
+        <h2>BundleCollectionConfig Properties</h2>
+
+        <table class="config-table table table-bordered">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="config-prop">JsRoot</span></td>
+                    <td><span class="config-type">string?</span></td>
+                    <td><span class="config-default">"js/controller"</span></td>
+                    <td>Root folder for per-controller/action JS bundles, relative to <code>wwwroot/</code>.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">CssRoot</span></td>
+                    <td><span class="config-type">string?</span></td>
+                    <td><span class="config-default">"css/controller"</span></td>
+                    <td>Root folder for per-controller/action CSS bundles, relative to <code>wwwroot/</code>.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">CriticalJsRoot</span></td>
+                    <td><span class="config-type">string?</span></td>
+                    <td><span class="config-default">"js/critical"</span></td>
+                    <td>JS files here are inlined via <code>&lt;critical-script-bundle-loader/&gt;</code> before all other scripts.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">CriticalCssRoot</span></td>
+                    <td><span class="config-type">string?</span></td>
+                    <td><span class="config-default">"css/critical"</span></td>
+                    <td>CSS files here are inlined via <code>&lt;critical-style-bundle-loader/&gt;</code> above all other styles.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">CommonCssRoot</span></td>
+                    <td><span class="config-type">string?</span></td>
+                    <td><span class="config-default">"css/Common"</span></td>
+                    <td>CSS shared across every page. Served as <code>/bundles/z-Shared.css</code>.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">CommonJsRoot</span></td>
+                    <td><span class="config-type">string?</span></td>
+                    <td><span class="config-default">"js/Common"</span></td>
+                    <td>JS shared across every page. Served as <code>/bundles/z-Shared.js</code>.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">IsMinified</span></td>
+                    <td><span class="config-type">bool</span></td>
+                    <td><span class="config-default">false</span></td>
+                    <td>Enable NUglify minification for all CSS and JS bundles.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">IsEnvironmentDev</span></td>
+                    <td><span class="config-type">bool</span></td>
+                    <td><span class="config-default">false</span></td>
+                    <td>Switches bundle file extension to <code>.dev.</code> (e.g. <code>home.dev.css</code>). Useful to distinguish dev bundles in browser devtools.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">EnableCacheBusting</span></td>
+                    <td><span class="config-type">bool</span></td>
+                    <td><span class="config-default">false</span></td>
+                    <td>Appends a content-hash fingerprint to bundle URLs (<code>?v=abc123</code>). Recommended in development to prevent stale assets.</td>
+                </tr>
+                <tr>
+                    <td><span class="config-prop">EnableBenchmark</span></td>
+                    <td><span class="config-type">bool</span></td>
+                    <td><span class="config-default">false</span></td>
+                    <td>Registers a bulk <code>/bundles/bulk.*</code> route combining all assets. Required for the benchmark tag helper.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Recommended Configurations</h2>
+
+        <h3>Development</h3>
+        <pre class="docs-code">builder.Services.<span class="mt">AddDynamicBundle</span>(<span class="kw">new</span> <span class="cl">BundleCollectionConfig</span>
+{
+    IsMinified         = <span class="nb">false</span>,
+    IsEnvironmentDev   = <span class="nb">true</span>,
+    EnableCacheBusting = <span class="nb">true</span>,   <span class="cm">// append ?v=hash to bust browser cache</span>
+    EnableBenchmark    = <span class="nb">true</span>,
+});</pre>
+
+        <h3>Production</h3>
+        <pre class="docs-code">builder.Services.<span class="mt">AddDynamicBundle</span>(<span class="kw">new</span> <span class="cl">BundleCollectionConfig</span>
+{
+    IsMinified         = <span class="nb">true</span>,
+    IsEnvironmentDev   = <span class="nb">false</span>,
+    EnableCacheBusting = <span class="nb">false</span>,  <span class="cm">// permanent URLs with max-age=31536000</span>
+    EnableBenchmark    = <span class="nb">false</span>,
+});</pre>
+
+        <h3>Auto-detect from environment</h3>
+        <pre class="docs-code"><span class="kw">var</span> isDev = builder.Environment.<span class="mt">IsDevelopment</span>();
+
+builder.Services.<span class="mt">AddDynamicBundle</span>(<span class="kw">new</span> <span class="cl">BundleCollectionConfig</span>
+{
+    IsMinified         = !isDev,
+    IsEnvironmentDev   = isDev,
+    EnableCacheBusting = isDev,
+    EnableBenchmark    = isDev,
+});</pre>
+
+        <h2>Custom Root Paths</h2>
+        <p>If your <code>wwwroot/</code> uses a different folder structure, override the root properties:</p>
+        <pre class="docs-code">builder.Services.<span class="mt">AddDynamicBundle</span>(<span class="kw">new</span> <span class="cl">BundleCollectionConfig</span>
+{
+    JsRoot          = <span class="str">"assets/js/pages"</span>,
+    CssRoot         = <span class="str">"assets/css/pages"</span>,
+    CriticalCssRoot = <span class="str">"assets/css/above-fold"</span>,
+    CriticalJsRoot  = <span class="str">"assets/js/inline"</span>,
+    CommonCssRoot   = <span class="str">"assets/css/shared"</span>,
+    CommonJsRoot    = <span class="str">"assets/js/shared"</span>,
+    IsMinified      = <span class="nb">true</span>,
+});</pre>
+
+        <div class="callout callout-info">
+            <strong>Null roots are skipped.</strong>
+            Set any root property to <code>null</code> to disable that bundle category entirely.
+            For example, <code>CriticalCssRoot = null</code> disables critical CSS processing.
+        </div>
+
+        <h2>Cache Busting</h2>
+        <p>
+            When <code>EnableCacheBusting = true</code>, bundle URLs include a SHA-256 content fingerprint:
+        </p>
+        <pre class="docs-code">&lt;link rel="stylesheet" href="<span class="str">/bundles/home.min.css?v=4a2b9f1c…</span>" /&gt;</pre>
+        <p>
+            The fingerprint is derived from the bundle's content, so it only changes when files change.
+            In production with <code>max-age=31536000</code> set by the middleware, clean URLs are preferred.
+        </p>
+
+        <h2>HTTP Caching</h2>
+        <p>
+            <code>BundleServingMiddleware</code> automatically sets the following headers on every bundle response:
+        </p>
+        <pre class="docs-code">Cache-Control: public, max-age=31536000
+ETag: "<span class="str">4a2b9f1c…</span>"</pre>
+        <p>
+            Subsequent requests with a matching <code>If-None-Match</code> header receive a <code>304 Not Modified</code>
+            response with no body.
+        </p>
+
+        <div style="margin-top: 2.5rem; display:flex; gap: 1rem;">
+            <a asp-controller="Docs" asp-action="Benchmark" class="btn btn-primary btn-sm">Benchmark →</a>
+            <a asp-controller="Docs" asp-action="Setup" class="btn btn-outline-secondary btn-sm">← Setup</a>
+        </div>
+    </div>
+</div>

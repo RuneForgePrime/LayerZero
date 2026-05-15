@@ -1,0 +1,124 @@
+@{
+    ViewData["Title"] = "Setup — LayerZero.Tools.Web";
+}
+
+<div class="docs-wrapper">
+    <aside class="docs-sidebar">
+        @await Html.PartialAsync("_DocsSidebar")
+    </aside>
+
+    <div class="docs-content">
+        <h1>Setup</h1>
+        <p class="page-subtitle">Add LayerZero.Tools.Web to your ASP.NET Core project in four steps.</p>
+
+        <!-- Step 1 -->
+        <div class="step-row" style="margin-top:1.75rem">
+            <span class="step-badge">1</span>
+            <h3>Install the Package</h3>
+        </div>
+        <p>Add the NuGet package to your project:</p>
+        <pre class="docs-code">dotnet add package <span class="str">LayerZero.Tools.Web</span></pre>
+        <p>Or reference the project directly if working from source:</p>
+        <pre class="docs-code">dotnet add reference <span class="str">../LayerZero.Tools.Web/LayerZero.Tools.Web.csproj</span></pre>
+
+        <!-- Step 2 -->
+        <div class="step-row">
+            <span class="step-badge">2</span>
+            <h3>Register in <code>Program.cs</code></h3>
+        </div>
+        <p>Register the bundle service and middleware:</p>
+        <pre class="docs-code"><span class="kw">var</span> builder = WebApplication.<span class="mt">CreateBuilder</span>(args);
+
+builder.Services.<span class="mt">AddControllersWithViews</span>();
+
+<span class="cm">// Register LayerZero bundle service</span>
+builder.Services.<span class="mt">AddDynamicBundle</span>(<span class="kw">new</span> <span class="cl">BundleCollectionConfig</span>
+{
+    EnableCacheBusting = builder.Environment.<span class="mt">IsDevelopment</span>(),
+    IsMinified         = <span class="nb">true</span>,
+    IsEnvironmentDev   = builder.Environment.<span class="mt">IsDevelopment</span>(),
+});
+
+<span class="kw">var</span> app = builder.<span class="mt">Build</span>();
+
+app.<span class="mt">UseStaticFiles</span>();
+app.<span class="mt">UseRouting</span>();
+app.<span class="mt">UseAuthorization</span>();
+
+<span class="cm">// Register the bundle serving middleware</span>
+app.<span class="mt">UseBundleServing</span>();
+
+app.<span class="mt">MapControllerRoute</span>(name: <span class="str">"default"</span>, pattern: <span class="str">"{controller=Home}/{action=Index}/{id?}"</span>);
+app.<span class="mt">Run</span>();</pre>
+
+        <div class="callout callout-warning">
+            <strong>Middleware order matters.</strong>
+            <code>UseBundleServing()</code> should be placed after <code>UseStaticFiles()</code> and <code>UseRouting()</code>.
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-row">
+            <span class="step-badge">3</span>
+            <h3>Register TagHelpers in <code>_ViewImports.cshtml</code></h3>
+        </div>
+        <pre class="docs-code">@@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@@addTagHelper *, <span class="str">LayerZero.Tools.Web</span></pre>
+
+        <!-- Step 4 -->
+        <div class="step-row">
+            <span class="step-badge">4</span>
+            <h3>Add TagHelpers to <code>_Layout.cshtml</code></h3>
+        </div>
+        <p>Place the bundle loaders in your layout file:</p>
+        <pre class="docs-code">&lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /&gt;
+
+    <span class="cm">&lt;!-- Inlines critical CSS above all other styles --&gt;</span>
+    &lt;<span class="cl">critical-style-bundle-loader</span>/&gt;
+
+    <span class="cm">&lt;!-- Emits controller + action &lt;link&gt; tags --&gt;</span>
+    &lt;<span class="cl">style-bundle-loader</span>/&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    @@RenderBody()
+
+    &lt;script src="~/lib/jquery/dist/jquery.min.js"&gt;&lt;/script&gt;
+
+    <span class="cm">&lt;!-- Inlines critical JS before other scripts --&gt;</span>
+    &lt;<span class="cl">critical-script-bundle-loader</span>/&gt;
+
+    &lt;script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+
+    <span class="cm">&lt;!-- Emits controller + action &lt;script&gt; tags --&gt;</span>
+    &lt;<span class="cl">script-bundle-loader</span>/&gt;
+&lt;/body&gt;</pre>
+
+        <h2>Folder Setup</h2>
+        <p>Create the bundle source folders under <code>wwwroot/</code>. The library will discover them automatically.</p>
+        <pre class="docs-code">wwwroot/
+├── css/
+│   ├── Controller/          <span class="cm">← per-controller CSS</span>
+│   │   └── Home/
+│   │       └── Index/       <span class="cm">← per-action CSS</span>
+│   ├── Common/              <span class="cm">← shared CSS (loaded on every page)</span>
+│   └── critical/            <span class="cm">← inlined above everything</span>
+└── js/                      <span class="cm">← mirrors css/ structure</span></pre>
+
+        <div class="callout callout-tip">
+            <strong>Empty folders are skipped.</strong>
+            If a controller or action folder contains no files, no bundle route is registered for it.
+            You can safely have the folder structure without every folder being populated.
+        </div>
+
+        <h2>Verify it's Working</h2>
+        <p>Run your app and inspect the page source. You should see bundle <code>&lt;link&gt;</code>/<code>&lt;script&gt;</code> tags
+        generated by the TagHelpers, and you can navigate directly to a bundle URL like
+        <code>/bundles/home.min.css</code> to confirm the middleware is serving content.</p>
+
+        <div style="margin-top: 2.5rem; display:flex; gap: 1rem;">
+            <a asp-controller="Docs" asp-action="Configuration" class="btn btn-primary btn-sm">Configuration →</a>
+            <a asp-controller="Docs" asp-action="Introduction" class="btn btn-outline-secondary btn-sm">← Introduction</a>
+        </div>
+    </div>
+</div>

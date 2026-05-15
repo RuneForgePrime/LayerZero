@@ -1,0 +1,156 @@
+@{
+    ViewData["Title"] = "Changelog — LayerZero.Tools.Web";
+}
+
+<div class="docs-wrapper">
+    <aside class="docs-sidebar">
+        @await Html.PartialAsync("_DocsSidebar")
+    </aside>
+
+    <div class="docs-content">
+        <h1>Changelog</h1>
+        <p class="page-subtitle">All notable changes to <strong>LayerZero.Tools.Web</strong>, newest first.</p>
+
+        <!-- v2.1.0 -->
+        <div class="changelog-entry">
+            <div class="changelog-header">
+                <span class="changelog-version-tag">v2.1.0</span>
+                <span class="changelog-date">2026-05-15</span>
+            </div>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-removed">Removed</span>
+            </div>
+            <ul class="changelog-list">
+                <li><strong>LigerShark.WebOptimizer.Core</strong> — replaced with built-in <code>BundleStore</code> and <code>BundleServingMiddleware</code>. Update <code>app.UseWebOptimizer()</code> → <code>app.UseBundleServing()</code>.</li>
+                <li><strong>AngleSharp.Css</strong> — CSS parsing replaced with NUglify. Critical CSS output changes from pretty-printed to minified; raw fallback retained.</li>
+                <li><strong>Esprima</strong> — JS validation replaced with NUglify. Behaviour unchanged: valid JS inlined as-is, errors produce a skip comment.</li>
+                <li><strong>CssFileParser / JsFileParser</strong> (<code>LayerZero.Tools.Web.Parser</code>) — internal helpers superseded by <code>BundleStore.Build()</code>. Remove any direct usages.</li>
+            </ul>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-improved">Improvements</span>
+            </div>
+            <ul class="changelog-list">
+                <li>Fully self-contained — only NUglify and ASP.NET Core framework reference required.</li>
+                <li>Critical CSS and JS now flow through the same <code>BundleStore</code> pipeline — unified caching, file-watcher eviction, and ETag fingerprinting.</li>
+                <li>Critical assets accessible via HTTP routes (<code>/bundles/z-Critical.css</code>, <code>/bundles/z-Critical.js</code>) for inspection and debugging.</li>
+                <li>File-system watcher uses targeted per-directory watchers (one per unique glob base directory) instead of a single <code>wwwroot</code> watcher.</li>
+                <li>Cache eviction on <code>RegisterBundle</code> prevents stale content when a bundle descriptor is overwritten.</li>
+                <li>Watcher auto-starts on first <code>TryGetOrBuild</code> call, guaranteeing active watching even without explicit <code>StartWatchers()</code> invocation.</li>
+                <li>Minification errors prepended as comments inside the bundle; raw content served as fallback.</li>
+                <li>Cache-busting <code>?v=</code> fingerprint derived from content SHA-256 hash — stable across requests, changes only when content changes.</li>
+                <li>304 Not Modified support via <code>If-None-Match</code> / <code>ETag</code> header round-trip.</li>
+                <li>Optional <code>ILogger&lt;BundleStore&gt;</code> — logging available if the host configures it, no forced dependency.</li>
+            </ul>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-breaking">Breaking Changes</span>
+            </div>
+            <ul class="changelog-list">
+                <li><code>app.UseWebOptimizer()</code> must be replaced with <code>app.UseBundleServing()</code>.</li>
+                <li>Critical CSS output format changed from indented/pretty-printed to NUglify-minified.</li>
+                <li><code>LayerZero.Tools.Web.Parser.CssFileParser</code> and <code>JsFileParser</code> removed — remove any direct usages.</li>
+            </ul>
+        </div>
+
+        <!-- v1.3.0 -->
+        <div class="changelog-entry">
+            <div class="changelog-header">
+                <span class="changelog-version-tag">v1.3.0</span>
+                <span class="changelog-date">2025-07-06</span>
+            </div>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-added">Added</span>
+            </div>
+            <ul class="changelog-list">
+                <li><strong>Critical JS support</strong> — place scripts in <code>wwwroot/js/critical/</code>. Files are merged and injected inline before all other bundles via <code>&lt;critical-script-bundle-loader/&gt;</code>.</li>
+                <li>Designed for early-execution logic: feature flags, layout adjustments, performance-critical bootstraps.</li>
+            </ul>
+        </div>
+
+        <!-- v1.2.0 -->
+        <div class="changelog-entry">
+            <div class="changelog-header">
+                <span class="changelog-version-tag">v1.2.0</span>
+                <span class="changelog-date">2025-06-24</span>
+            </div>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-added">Added</span>
+            </div>
+            <ul class="changelog-list">
+                <li>Inline critical JavaScript under <code>wwwroot/js/critical/</code> — merged into a single <code>&lt;script&gt;</code> tag above other bundles.</li>
+                <li>New TagHelpers: <code>&lt;critical-script-bundle-loader/&gt;</code> and <code>&lt;critical-style-bundle-loader/&gt;</code>.</li>
+            </ul>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-improved">Improvements</span>
+            </div>
+            <ul class="changelog-list">
+                <li>Enhanced documentation and inline injection examples.</li>
+            </ul>
+        </div>
+
+        <!-- v1.1.0 -->
+        <div class="changelog-entry">
+            <div class="changelog-header">
+                <span class="changelog-version-tag">v1.1.0</span>
+                <span class="changelog-date">2025-06-21</span>
+            </div>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-added">Added</span>
+            </div>
+            <ul class="changelog-list">
+                <li><strong>Critical CSS support</strong> — files under <code>wwwroot/css/critical/</code> merged into a single <code>&lt;style&gt;</code> tag injected before all other bundles.</li>
+                <li>Development mode cache-busting via version query strings (<code>?v=timestamp</code>).</li>
+            </ul>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-fixed">Fixed</span>
+            </div>
+            <ul class="changelog-list">
+                <li><code>AddDynamicBundle()</code> now accepts optional <code>IWebHostEnvironment</code> for correct dev/prod detection. Defaults to <code>isDevelopment = false</code> for backward compatibility.</li>
+            </ul>
+        </div>
+
+        <!-- v1.0.1 -->
+        <div class="changelog-entry">
+            <div class="changelog-header">
+                <span class="changelog-version-tag">v1.0.1</span>
+                <span class="changelog-date">2025-06-10</span>
+            </div>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-fixed">Fixed</span>
+            </div>
+            <ul class="changelog-list">
+                <li>TagHelper bug where controller/action resolution failed in certain nested route structures.</li>
+                <li>Bundle generation skipped when asset directories were empty (edge case regression).</li>
+            </ul>
+        </div>
+
+        <!-- v1.0.0 -->
+        <div class="changelog-entry">
+            <div class="changelog-header">
+                <span class="changelog-version-tag">v1.0.0</span>
+                <span class="changelog-date">2025-06-08</span>
+            </div>
+
+            <div class="changelog-section-title">
+                <span class="cl-badge cl-added">Initial Release</span>
+            </div>
+            <ul class="changelog-list">
+                <li>Convention-based bundle generation using WebOptimizer.</li>
+                <li>Razor TagHelpers for automatic CSS/JS injection.</li>
+                <li>Controller/action folder structure discovery.</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <a asp-controller="Docs" asp-action="Benchmark" class="btn btn-outline-secondary btn-sm">← Benchmark</a>
+        </div>
+    </div>
+</div>

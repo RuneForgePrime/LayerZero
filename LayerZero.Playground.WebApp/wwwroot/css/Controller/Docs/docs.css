@@ -1,0 +1,304 @@
+/* ─── Docs layout ────────────────────────────────────────────────────────── */
+.docs-wrapper {
+    display: flex;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
+    align-items: flex-start;
+}
+
+.docs-sidebar {
+    width: 210px;
+    flex-shrink: 0;
+}
+
+.docs-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ─── Sidebar nav ────────────────────────────────────────────────────────── */
+.docs-nav {
+    position: sticky;
+    top: 1.25rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem 0.5rem;
+}
+
+.docs-nav .nav-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6c757d;
+    padding: 0 0.75rem 0.5rem;
+    display: block;
+}
+
+.docs-nav .nav-link {
+    color: #444;
+    padding: 0.45rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: block;
+    transition: background 0.15s, color 0.15s;
+}
+
+.docs-nav .nav-link:hover {
+    background: #e9ecef;
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.docs-nav .nav-link.active {
+    background: #dce8fd;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* ─── Content typography ─────────────────────────────────────────────────── */
+.docs-content h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.docs-content .page-subtitle {
+    color: #6c757d;
+    font-size: 1.05rem;
+    margin-bottom: 1.75rem;
+}
+
+.docs-content h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 2.25rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.docs-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.docs-content p {
+    line-height: 1.7;
+    color: #333;
+}
+
+/* ─── Code blocks ────────────────────────────────────────────────────────── */
+.docs-code {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 1.1rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 0.75rem 0 1.25rem;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+.docs-code .kw  { color: #cba6f7; } /* keyword  */
+.docs-code .str { color: #a6e3a1; } /* string   */
+.docs-code .cm  { color: #6c7086; } /* comment  */
+.docs-code .cl  { color: #89b4fa; } /* class    */
+.docs-code .mt  { color: #89dceb; } /* method   */
+.docs-code .nb  { color: #fab387; } /* number/bool */
+
+code {
+    background: #eef1f8;
+    color: #c0392b;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.87em;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+}
+
+/* ─── Callouts ───────────────────────────────────────────────────────────── */
+.callout {
+    padding: 0.9rem 1.15rem;
+    border-left: 4px solid;
+    border-radius: 0 8px 8px 0;
+    margin: 1.25rem 0;
+    font-size: 0.93rem;
+}
+
+.callout-info    { border-color: #0d6efd; background: #eaf1fe; }
+.callout-warning { border-color: #e67e22; background: #fef5eb; }
+.callout-tip     { border-color: #198754; background: #eaf6ee; }
+.callout-break   { border-color: #dc3545; background: #fdecea; }
+
+.callout strong { display: block; margin-bottom: 0.2rem; }
+
+/* ─── Feature list ───────────────────────────────────────────────────────── */
+.feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1rem;
+    margin: 1rem 0;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.93rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    background: #f8f9fa;
+}
+
+.feature-item .fi-icon { color: #198754; font-size: 0.9rem; margin-top: 1px; }
+
+/* ─── Config table ───────────────────────────────────────────────────────── */
+.config-table {
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.config-table thead th {
+    background: #f1f3f5;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.config-table td, .config-table th {
+    padding: 0.6rem 0.85rem;
+    vertical-align: top;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.config-table tr:hover td { background: #fafbfc; }
+
+.config-prop { font-weight: 600; color: #0d6efd; font-family: 'Consolas', monospace; font-size: 0.88rem; }
+.config-type { color: #6c757d; font-family: 'Consolas', monospace; font-size: 0.85rem; }
+.config-default { color: #198754; font-family: 'Consolas', monospace; font-size: 0.85rem; }
+
+/* ─── Changelog ──────────────────────────────────────────────────────────── */
+.changelog-entry {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.changelog-entry:last-child { border-bottom: none; }
+
+.changelog-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.changelog-version-tag {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.changelog-date {
+    color: #6c757d;
+    font-size: 0.88rem;
+}
+
+.changelog-section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cl-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.cl-removed  { background: #fde8ea; color: #c0392b; }
+.cl-added    { background: #e6f4ea; color: #155724; }
+.cl-improved { background: #dce8fd; color: #0b4fcc; }
+.cl-breaking { background: #fef5eb; color: #7d4f00; }
+.cl-fixed    { background: #f0e6fd; color: #5a0099; }
+
+.changelog-list {
+    padding-left: 1.2rem;
+    margin: 0;
+}
+
+.changelog-list li {
+    padding: 0.25rem 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+/* ─── Folder tree ────────────────────────────────────────────────────────── */
+.folder-tree {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 1.25rem;
+    border-radius: 8px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.84rem;
+    line-height: 1.8;
+}
+
+.folder-tree .ft-dir  { color: #89b4fa; }
+.folder-tree .ft-file { color: #a6e3a1; }
+.folder-tree .ft-dim  { color: #585b70; }
+
+/* ─── Version pill ───────────────────────────────────────────────────────── */
+.version-pill {
+    display: inline-block;
+    background: #0d6efd;
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    vertical-align: middle;
+    margin-left: 0.35rem;
+}
+
+/* ─── Step badge ─────────────────────────────────────────────────────────── */
+.step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    background: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.step-row h3 { margin: 0; line-height: 1.6; }
+
+@media (max-width: 768px) {
+    .docs-wrapper { flex-direction: column; }
+    .docs-sidebar { width: 100%; }
+    .docs-nav { position: static; }
+    .feature-grid { grid-template-columns: 1fr; }
+}
