@@ -1,9 +1,7 @@
 using LayerZero.Tools.Guard;
 using LayerZero.Tools.IO;
 using LayerZero.Tools.Web.Configuration;
-using LayerZero.Tools.Web.Parser;
 using LayerZero.Tools.Web.Services.Bundles;
-using System.Text;
 
 namespace LayerZero.Tools.Web.Bundles
 {
@@ -78,33 +76,21 @@ namespace LayerZero.Tools.Web.Bundles
                 }
             }
 
-            var rootFolderCssCritical = GenerateFullPath(rootDirectory,Cfg.CriticalCssRoot);
-
-            var cssCriticalFiles = SpindleTree.GetAllFilesPath(rootFolderCssCritical, FileExtensions: [".css"]);
-
-            var criticalCss = new StringBuilder();
-            cssCriticalFiles?.ForEach(f =>
+            var rootFolderCssCritical = GenerateFullPath(rootDirectory, Cfg.CriticalCssRoot);
+            if (rootFolderCssCritical != null && SpindleTree.GetAllFilesPath(rootFolderCssCritical, FileExtensions: [".css"])?.Count > 0)
             {
-                var rules = CssFileParser.Analyse(f);
-                criticalCss.AppendLine(rules);
-            });
+                _bundles.SetIsCriticalCssAvailable(true);
+                builder.RegisterBundle($"/bundles/z-Critical{extension}css",
+                    [$"{Cfg.CriticalCssRoot!.Replace("\\", "/")}/**/*.css"], BundleType.Css, Cfg.IsMinified);
+            }
 
-            if(!string.IsNullOrEmpty(criticalCss.ToString()))
-                _bundles.SetCriticalCss(criticalCss.ToString());
-
-
-            var rootFolderJsCritical = GenerateFullPath(rootDirectory,Cfg.CriticalJsRoot);
-            var jsCriticalFiles = SpindleTree.GetAllFilesPath(rootFolderJsCritical, FileExtensions: [".js"]);
-
-            var criticalJs = new StringBuilder();
-            jsCriticalFiles?.ForEach(f =>
+            var rootFolderJsCritical = GenerateFullPath(rootDirectory, Cfg.CriticalJsRoot);
+            if (rootFolderJsCritical != null && SpindleTree.GetAllFilesPath(rootFolderJsCritical, FileExtensions: [".js"])?.Count > 0)
             {
-                var script = JsFileParser.Analyse(f);
-                criticalJs.AppendLine(script);
-            });
-
-            if (!string.IsNullOrEmpty(criticalJs.ToString()))
-                _bundles.SetCriticalJs(criticalJs.ToString());
+                _bundles.SetIsCriticalJsAvailable(true);
+                builder.RegisterBundle($"/bundles/z-Critical{extension}js",
+                    [$"{Cfg.CriticalJsRoot!.Replace("\\", "/")}/**/*.js"], BundleType.Js, Cfg.IsMinified);
+            }
 
 
             if (SpindleTree.GetAllFilesPath(GenerateFullPath(rootDirectory,Cfg.CommonCssRoot), FileExtensions: [".css"])?.Count > 0)
@@ -141,10 +127,8 @@ namespace LayerZero.Tools.Web.Bundles
 
             List<string> cssAssets = new List<string>();
 
-
-            var cssAssetsPath = GenerateFullPath(rootDirectory, Cfg.CssRoot);
-            if(cssAssets != null)
-                cssAssets.Add($"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css");
+            if (!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CssRoot)))
+                    cssAssets.Add($"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css");
 
 
             if(!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CriticalCssRoot)))

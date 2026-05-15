@@ -15,44 +15,73 @@ namespace LayerZero.Tools.Web.Bundles
         private readonly ILogger<BundleStore> _logger;
         private readonly ConcurrentDictionary<string, BundleDescriptor> _descriptors = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, CachedBundle> _contentCache = new(StringComparer.OrdinalIgnoreCase);
-        private readonly FileSystemWatcher? _watcher;
+        private readonly List<FileSystemWatcher> _watchers = new();
 
         public BundleStore(string webRootPath, ILogger<BundleStore>? logger = null)
         {
             _webRootPath = webRootPath;
             _logger = logger ?? NullLogger<BundleStore>.Instance;
-            if (Directory.Exists(webRootPath))
-                _watcher = StartWatcher();
         }
 
-        private FileSystemWatcher StartWatcher()
+        public void StartWatchers()
         {
-            var watcher = new FileSystemWatcher(_webRootPath)
-            {
-                IncludeSubdirectories = true,
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
-                EnableRaisingEvents = true
-            };
-            watcher.Changed += OnFileChanged;
-            watcher.Created += OnFileChanged;
-            watcher.Renamed += (s, e) => OnFileChanged(s, e);
-            return watcher;
-        }
+            if (!Directory.Exists(_webRootPath)) return;
 
-        private void OnFileChanged(object sender, FileSystemEventArgs e)
-        {
-            var relativePath = Path.GetRelativePath(_webRootPath, e.FullPath).Replace('\\', '/');
+            var dirToRoutes = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             foreach (var (route, descriptor) in _descriptors)
             {
-                var matcher = new Matcher();
                 foreach (var glob in descriptor.Globs)
-                    matcher.AddInclude(glob);
-                if (matcher.Match(relativePath).HasMatches && _contentCache.TryRemove(route, out _))
-                    _logger.LogInformation("Bundle cache evicted: {Route} (file changed: {File})", route, relativePath);
+                {
+                    var relBase = GetGlobBaseDir(glob);
+                    var absBase = Path.GetFullPath(Path.Combine(_webRootPath, relBase.Replace('/', Path.DirectorySeparatorChar)));
+                    if (!Directory.Exists(absBase)) continue;
+
+                    if (!dirToRoutes.TryGetValue(absBase, out var routes))
+                        dirToRoutes[absBase] = routes = new List<string>();
+                    if (!routes.Contains(route))
+                        routes.Add(route);
+                }
             }
+
+            foreach (var (dir, routes) in dirToRoutes)
+            {
+                var capturedRoutes = routes;
+                var watcher = new FileSystemWatcher(dir)
+                {
+                    IncludeSubdirectories = true,
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
+                    EnableRaisingEvents = true
+                };
+                void OnChanged(object s, FileSystemEventArgs e)
+                {
+                    foreach (var route in capturedRoutes)
+                    {
+                        if (_contentCache.TryRemove(route, out _))
+                            _logger.LogInformation("Bundle cache evicted: {Route} (file changed: {File})", route, e.Name);
+                    }
+                }
+                watcher.Changed += OnChanged;
+                watcher.Created += OnChanged;
+                watcher.Renamed += (s, e) => OnChanged(s, e);
+                _watchers.Add(watcher);
+            }
+
+            _logger.LogInformation("Bundle watchers started: {Count} director{Suffix} monitored",
+                dirToRoutes.Count, dirToRoutes.Count == 1 ? "y" : "ies");
         }
 
-        public void Dispose() => _watcher?.Dispose();
+        private static string GetGlobBaseDir(string glob)
+        {
+            var star = glob.IndexOf('*');
+            var dir = star < 0 ? glob : glob[..star];
+            return dir.TrimEnd('/').TrimEnd('\\');
+        }
+
+        public void Dispose()
+        {
+            foreach (var w in _watchers)
+                w.Dispose();
+        }
 
         public void RegisterBundle(string route, string[] sourceGlobs, BundleType type, bool minify)
         {

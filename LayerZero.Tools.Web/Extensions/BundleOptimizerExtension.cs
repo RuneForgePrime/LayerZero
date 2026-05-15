@@ -20,6 +20,7 @@ namespace LayerZero.Tools.Web.Extensions
                 DynamicBundleMapper.Register(store, Config);
                 if (Config.EnableBenchmark)
                     DynamicBundleMapper.RegisterBulk(store, Config);
+                store.StartWatchers();
                 return store;
             });
 
