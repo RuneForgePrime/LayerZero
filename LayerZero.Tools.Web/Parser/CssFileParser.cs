@@ -8,7 +8,7 @@ namespace LayerZero.Tools.Web.Parser
         {
             var css = File.ReadAllText(CssFilePath);
             var result = Uglify.Css(css);
-            return result.HasErrors ? css : result.Code;
+            return string.IsNullOrWhiteSpace(result.Code) ? css : result.Code;
         }
     }
 }
