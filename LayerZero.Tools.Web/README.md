@@ -191,6 +191,7 @@ app.UseBundleServing();
 - **Removed `LigerShark.WebOptimizer.Core`** — replaced with a built-in `BundleStore` (lazy `ConcurrentDictionary` cache) and `BundleServingMiddleware`. Update `app.UseWebOptimizer()` → `app.UseBundleServing()`.
 - **Removed `AngleSharp.Css`** — CSS parsing and formatting replaced with `NUglify`. Critical CSS is now minified inline rather than pretty-printed.
 - **Removed `Esprima`** — JS syntax validation replaced with `NUglify`. Behaviour is identical: valid JS is inlined as-is; invalid JS produces a skip comment.
+- **Removed `CssFileParser` / `JsFileParser`** (`LayerZero.Tools.Web.Parser`) — internal helpers superseded by `BundleStore.Build()`. If you referenced these classes directly, remove those usages.
 
 > **Migration note:** Replace `app.UseWebOptimizer()` with `app.UseBundleServing()` in your `Program.cs`.
 

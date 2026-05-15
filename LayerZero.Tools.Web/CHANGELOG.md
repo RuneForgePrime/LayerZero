@@ -20,15 +20,21 @@ All notable changes to this project are documented in this file.
 - **`Esprima`** — removed JS syntax validator dependency.
   - JS validation now handled by `NUglify`. Behaviour is identical: valid JS is inlined as-is; files with syntax errors produce a `/* File X Skipped: reason */` comment.
 
+- **`CssFileParser` / `JsFileParser`** — removed internal parser utility classes (`LayerZero.Tools.Web.Parser` namespace).
+  - These were internal helpers for critical asset loading, now superseded by `BundleStore.Build()` which handles all asset types uniformly.
+
 ### 🛠 Improvements
 
 - `LayerZero.Tools.Web` is now fully self-contained — only `NUglify` and the ASP.NET Core framework reference are required.
 - Bundle serving no longer depends on any third-party middleware pipeline.
+- Critical CSS and JS now flow through the same `BundleStore` pipeline as all other bundles — same build, same caching, same file-watcher eviction, same ETag fingerprinting.
+- Critical assets are also accessible as HTTP routes (`/bundles/z-Critical.css`, `/bundles/z-Critical.js`) for inspection and debugging.
 
 ### ⚠️ Breaking Changes
 
 - `app.UseWebOptimizer()` must be replaced with `app.UseBundleServing()`.
 - Critical CSS output format changed from indented/pretty-printed to NUglify-minified.
+- `LayerZero.Tools.Web.Parser.CssFileParser` and `LayerZero.Tools.Web.Parser.JsFileParser` are removed. If referenced directly, remove those usages.
 
 ---
 
