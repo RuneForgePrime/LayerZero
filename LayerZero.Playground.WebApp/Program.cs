@@ -1,6 +1,7 @@
 
 
 using LayerZero.Tools.Web.Extensions;
+using LayerZero.Tools.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +29,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.UseWebOptimizer();
+app.UseBundleServing();
 
 app.MapControllerRoute(
     name: "default",
