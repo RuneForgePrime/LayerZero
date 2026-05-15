@@ -1,11 +1,9 @@
-﻿using LayerZero.Tools.Guard;
+using LayerZero.Tools.Guard;
 using LayerZero.Tools.IO;
 using LayerZero.Tools.Web.Configuration;
 using LayerZero.Tools.Web.Parser;
 using LayerZero.Tools.Web.Services.Bundles;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text;
-using WebOptimizer;
 
 namespace LayerZero.Tools.Web.Bundles
 {
@@ -13,7 +11,7 @@ namespace LayerZero.Tools.Web.Bundles
     {
         public static BundleCollection _bundles { get; } = new();
 
-        public static void Register(IAssetPipeline pipeline, BundleCollectionConfig Cfg)
+        public static void Register(IBundleBuilder builder, BundleCollectionConfig Cfg)
         {
             _bundles.SetCacheBusting(Cfg.EnableCacheBusting);
             _bundles.SetIsDevEnv(Cfg.IsEnvironmentDev);
@@ -39,11 +37,7 @@ namespace LayerZero.Tools.Web.Bundles
                     if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.TopDirectoryOnly, [".js"]))
                         continue;
                     _bundles.RegisterJsBundle(name);
-
-                    if(!_bundles.IsMinified())
-                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/*.js");
-                    else
-                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/*.js").MinifyJavaScript();
+                    builder.RegisterBundle($"/bundles/{name}{extension}js", [$"{_item}/*.js"], BundleType.Js, Cfg.IsMinified);
                 }
                 else
                 {
@@ -51,10 +45,7 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
 
                     _bundles.RegisterJsBundle(name);
-                    if (!_bundles.IsMinified())
-                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/**/*.js");
-                    else
-                        pipeline.AddJavaScriptBundle($"/bundles/{name}{extension}js", $"{_item}/**/*.js").MinifyJavaScript();
+                    builder.RegisterBundle($"/bundles/{name}{extension}js", [$"{_item}/**/*.js"], BundleType.Js, Cfg.IsMinified);
                 }
             }
 
@@ -76,22 +67,14 @@ namespace LayerZero.Tools.Web.Bundles
                         continue;
 
                     _bundles.RegisterCssBundle(name);
-
-                    if (!_bundles.IsMinified())
-                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item}/*.css");
-                    else
-                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item}/*.css").MinifyCss();
+                    builder.RegisterBundle($"/bundles/{name}{extension}css", [$"{_item}/*.css"], BundleType.Css, Cfg.IsMinified);
                 }
                 else
                 {
                     if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.AllDirectories, [".css"]))
                         continue;
                     _bundles.RegisterCssBundle(name);
-
-                    if (!_bundles.IsMinified())
-                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css");
-                    else
-                        pipeline.AddCssBundle($"/bundles/{name}{extension}css", $"{_item.Replace("\\", "/")}/**/*.css").MinifyCss();
+                    builder.RegisterBundle($"/bundles/{name}{extension}css", [$"{_item.Replace("\\", "/")}/**/*.css"], BundleType.Css, Cfg.IsMinified);
                 }
             }
 
@@ -127,14 +110,14 @@ namespace LayerZero.Tools.Web.Bundles
             if (SpindleTree.GetAllFilesPath(GenerateFullPath(rootDirectory,Cfg.CommonCssRoot), FileExtensions: [".css"])?.Count > 0)
             {
                 _bundles.SetIsCommonCssAvailable(true);
-                pipeline.AddCssBundle($"/bundles/z-Shared{extension}css", $"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css");
+                builder.RegisterBundle($"/bundles/z-Shared{extension}css", [$"{Cfg.CommonCssRoot.Replace("\\", "/")}/**/*.css"], BundleType.Css, Cfg.IsMinified);
             }
 
 
             if (SpindleTree.GetAllFilesPath(GenerateFullPath(rootDirectory,Cfg.CommonJsRoot), FileExtensions: [".js"])?.Count > 0)
             {
                 _bundles.SetIsCommonJsAvailable(true);
-                pipeline.AddJavaScriptBundle($"/bundles/z-Shared{extension}js", $"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js");
+                builder.RegisterBundle($"/bundles/z-Shared{extension}js", [$"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js"], BundleType.Js, Cfg.IsMinified);
             }
 
         }
@@ -148,7 +131,7 @@ namespace LayerZero.Tools.Web.Bundles
         }
 
 
-        public static void RegisterBulk(IAssetPipeline pipeline, BundleCollectionConfig Cfg)
+        public static void RegisterBulk(IBundleBuilder builder, BundleCollectionConfig Cfg)
         {
 
             _bundles.SetBulkMode(true);
@@ -162,7 +145,7 @@ namespace LayerZero.Tools.Web.Bundles
             var cssAssetsPath = GenerateFullPath(rootDirectory, Cfg.CssRoot);
             if(cssAssets != null)
                 cssAssets.Add($"{Cfg.CssRoot.Replace("\\", "/")}/**/*.css");
-            
+
 
             if(!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CriticalCssRoot)))
                 cssAssets.Add($"{Cfg.CriticalCssRoot.Replace("\\", "/")}/**/*.css");
@@ -172,17 +155,7 @@ namespace LayerZero.Tools.Web.Bundles
 
 
             if (cssAssets.Any())
-            {
-                if (_bundles.IsMinified())
-                {
-                    pipeline.AddCssBundle($"/bundles/bulk{extension}css", cssAssets.ToArray()).MinifyCss();
-                }
-                else
-                {
-                    pipeline.AddCssBundle($"/bundles/bulk{extension}css", cssAssets.ToArray());
-                }
-            }
-
+                builder.RegisterBundle($"/bundles/bulk{extension}css", cssAssets.ToArray(), BundleType.Css, Cfg.IsMinified);
 
 
             List<string> jsAssets = new List<string>();
@@ -199,16 +172,8 @@ namespace LayerZero.Tools.Web.Bundles
             if (!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CommonJsRoot)))
                 jsAssets.Add($"{Cfg.CommonJsRoot.Replace("\\", "/")}/**/*.js");
 
-            if (jsAssets.Any()) {
-                if (_bundles.IsMinified())
-                {
-                    pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", jsAssets.ToArray()).MinifyJavaScript();
-                }
-                else
-                {
-                    pipeline.AddJavaScriptBundle($"/bundles/bulk{extension}js", jsAssets.ToArray());
-                }
-            }
+            if (jsAssets.Any())
+                builder.RegisterBundle($"/bundles/bulk{extension}js", jsAssets.ToArray(), BundleType.Js, Cfg.IsMinified);
         }
     }
 }
