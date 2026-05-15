@@ -29,9 +29,9 @@ namespace LayerZero.Tools.CoreClasses
                 {
                     return JsonSerializer.Deserialize<T>(Input);
                 }
-                catch(Exception ex)
+                catch
                 {
-                    if (strict) throw ex;
+                    if (strict) throw;
                     return default;
                 }
             }
@@ -53,9 +53,9 @@ namespace LayerZero.Tools.CoreClasses
                 {
                     return (T?)Convert.ChangeType(Input, type);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    if (strict) throw ex;
+                    if (strict) throw;
 
                     return default;
                 }
@@ -68,7 +68,7 @@ namespace LayerZero.Tools.CoreClasses
                     try
                     {
                         if (strict)
-                            format.IsNotNullNorEmptyOrWhiteSpace();
+                            format?.IsNotNullNorEmptyOrWhiteSpace();
                         var result = format != null
                             ? DateTime.ParseExact(Input, format, culture)
                             : DateTime.Parse(Input, culture);
@@ -87,7 +87,7 @@ namespace LayerZero.Tools.CoreClasses
                     try
                     {
                         if (strict)
-                            format.IsNotNullNorEmptyOrWhiteSpace();
+                            format?.IsNotNullNorEmptyOrWhiteSpace();
                         var result = format != null
                             ? DateOnly.ParseExact(Input, format, culture)
                             : DateOnly.Parse(Input, culture);
@@ -107,7 +107,7 @@ namespace LayerZero.Tools.CoreClasses
                     try
                     {
                         if (strict)
-                            format.IsNotNullNorEmptyOrWhiteSpace();
+                            format?.IsNotNullNorEmptyOrWhiteSpace();
                         var result = format != null
                             ? TimeOnly.ParseExact(Input, format, culture)
                             : TimeOnly.Parse(Input, culture);

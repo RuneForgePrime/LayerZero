@@ -8,7 +8,7 @@ namespace LayerZero.Tools.Managements
     public class LeyLineCaller
     {
         private HttpClient _httpClient;
-        public LeyLineCaller(SigilBinder header, HttpClient httpClient = null)
+        public LeyLineCaller(SigilBinder header, HttpClient? httpClient = null)
         {
             _httpClient = httpClient ?? new HttpClient();
 
@@ -76,17 +76,17 @@ namespace LayerZero.Tools.Managements
             };
         }
 
-        public async Task<object> GetAsync<T>(string uri)
+        public async Task<object?> GetAsync<T>(string uri)
             => await ParseResponse<T>(await _GetAsync(uri));
 
-        public async Task<object> PostAsync<T>(string uri, object Object)
+        public async Task<object?> PostAsync<T>(string uri, object Object)
             => await ParseResponse<T>(await _PostAsync(uri, Object));
 
-        public object Get<T>(string uri)
-            => GeasMaster.RunSync<object>(() => GetAsync<T>(uri));
+        public object? Get<T>(string uri)
+            => GeasMaster.RunSync<object?>(() => GetAsync<T>(uri));
 
-        public object Post<T>(string uri, object Object)
-            => GeasMaster.RunSync<object>(() => PostAsync<T>(uri, Object));
+        public object? Post<T>(string uri, object Object)
+            => GeasMaster.RunSync<object?>(() => PostAsync<T>(uri, Object));
 
     }
 }

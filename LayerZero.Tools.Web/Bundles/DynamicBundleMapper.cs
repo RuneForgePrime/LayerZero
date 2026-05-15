@@ -122,7 +122,7 @@ namespace LayerZero.Tools.Web.Bundles
 
         }
 
-        private static string? GenerateFullPath(string Root, string relative)
+        private static string? GenerateFullPath(string Root, string? relative)
         {
             if (string.IsNullOrEmpty(relative))
                 return null;
