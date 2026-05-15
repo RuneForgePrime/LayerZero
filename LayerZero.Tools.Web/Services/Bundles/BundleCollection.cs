@@ -56,7 +56,7 @@ namespace LayerZero.Tools.Web.Services.Bundles
         public bool IsBulkActive() => this._isBulkActive;
 
         public HashSet<string> GetAllCss() => this._bundlesCss;
-        public HashSet<string?> GetAllJs() => this._bundlesJs;
+        public HashSet<string> GetAllJs() => this._bundlesJs;
 
         public void SetIsDevEnv(bool IsDevEnv) => this._isDevEnv = IsDevEnv;
         public void SetIsMinified(bool IsMinified) => this._isMinified = IsMinified;
