@@ -14,7 +14,7 @@ namespace LayerZero.Tools.Managements
 
             if (header is { IsValid: true })
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(header.TokenType, header.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(header.TokenType ?? string.Empty, header.AccessToken);
             }
         }
 
