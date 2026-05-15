@@ -28,8 +28,7 @@ namespace LayerZero.Tools.Web.Bundles
             if (!_descriptors.TryGetValue(route, out var descriptor))
                 return false;
 
-            var built = Build(descriptor);
-            bundle = _contentCache.GetOrAdd(route, built);
+            bundle = _contentCache.GetOrAdd(route, _ => Build(descriptor));
             return true;
         }
 
