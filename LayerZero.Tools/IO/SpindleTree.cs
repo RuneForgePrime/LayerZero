@@ -23,7 +23,7 @@ namespace LayerZero.Tools.IO
             if (isDirectoryempty)
                 return null;
 
-            var files = Directory.EnumerateFiles(DirectoryPath, "*.*", SearchOption);
+            var files = Directory.EnumerateFiles(DirectoryPath!, "*.*", SearchOption);
 
             if (FileExtensions == null || FileExtensions.Length == 0)
                 return files.ToList();
