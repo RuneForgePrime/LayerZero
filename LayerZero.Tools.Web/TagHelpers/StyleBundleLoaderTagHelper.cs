@@ -20,7 +20,7 @@ namespace LayerZero.Tools.Web.TagHelpers
 
         [ViewContext]
         [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        public ViewContext ViewContext { get; set; } = null!;
 
         private string CacheBust(string route)
         {
