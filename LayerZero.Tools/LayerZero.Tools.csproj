@@ -7,7 +7,7 @@
     <!-- NuGet Metadata -->
     <AssemblyName>LayerZero.Tools</AssemblyName>
     <PackageId>LayerZero.Tools</PackageId>
-    <Version>1.0.2</Version>
+    <Version>2.0.0</Version>
     <Authors>RuneForgePrime</Authors>
     <Company>LayerZero</Company>
     <Description>Foundational .NET utilities with minimal dependencies — includes type parsing, safe LINQ, sync task execution, and HTTP helpers.</Description>

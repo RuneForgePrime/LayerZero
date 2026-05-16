@@ -7,34 +7,28 @@ namespace LayerZero.Tools.Web.Bundles
 {
     public static class DynamicBundleMapper
     {
-        public static BundleCollection _bundles { get; } = new();
-
-        public static void Register(IBundleBuilder builder, BundleCollectionConfig Cfg)
+        public static void Register(IBundleBuilder builder, BundleCollection bundles, BundleCollectionConfig Cfg, string webRootPath)
         {
-            _bundles.SetCacheBusting(Cfg.EnableCacheBusting);
-            _bundles.SetIsDevEnv(Cfg.IsEnvironmentDev);
-            _bundles.SetIsMinified(Cfg.IsMinified);
+            bundles.SetCacheBusting(Cfg.EnableCacheBusting);
+            bundles.SetIsDevEnv(Cfg.IsEnvironmentDev);
+            bundles.SetIsMinified(Cfg.IsMinified);
 
             var extension = Cfg.IsEnvironmentDev ? ".dev." : Cfg.IsMinified ? ".min." : ".";
 
-
-            var rootDirectory = @"wwwroot/";
-
-            var rootFolderJs = GenerateFullPath(rootDirectory, Cfg.JsRoot);
+            var rootFolderJs = GenerateFullPath(webRootPath, Cfg.JsRoot);
             var JsFolders = rootFolderJs != null ? SpindleTree.GetDirectories(rootFolderJs, 2) : [];
 
 
             foreach (var item in JsFolders)
             {
-                var relativePath = item.Path.Replace(rootFolderJs!, string.Empty);
-                var _item = item.Path.Replace(rootDirectory, string.Empty).Replace("\\", "/").TrimEnd('/');
-                var name = _item.Replace(Cfg.JsRoot!, string.Empty).TrimStart('/');
+                var _item = Path.GetRelativePath(webRootPath, item.Path).Replace('\\', '/').TrimEnd('/');
+                var name = _item.Replace(Cfg.JsRoot!.Replace('\\', '/').TrimStart('/'), string.Empty).TrimStart('/');
 
                 if (item.Depth == 1)
                 {
                     if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.TopDirectoryOnly, [".js"]))
                         continue;
-                    _bundles.RegisterJsBundle(name);
+                    bundles.RegisterJsBundle(name);
                     builder.RegisterBundle($"/bundles/{name}{extension}js", [$"{_item}/*.js"], BundleType.Js, Cfg.IsMinified);
                 }
                 else
@@ -42,21 +36,20 @@ namespace LayerZero.Tools.Web.Bundles
                     if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.AllDirectories, [".js"]))
                         continue;
 
-                    _bundles.RegisterJsBundle(name);
+                    bundles.RegisterJsBundle(name);
                     builder.RegisterBundle($"/bundles/{name}{extension}js", [$"{_item}/**/*.js"], BundleType.Js, Cfg.IsMinified);
                 }
             }
 
 
-            var rootFolderCss = GenerateFullPath(rootDirectory, Cfg.CssRoot);
+            var rootFolderCss = GenerateFullPath(webRootPath, Cfg.CssRoot);
             var CssFolders = rootFolderCss != null ? SpindleTree.GetDirectories(rootFolderCss, 2) : [];
 
 
             foreach (var item in CssFolders)
             {
-                var relativePath = item.Path.Replace(rootFolderCss!, string.Empty);
-                var _item = item.Path.Replace(rootDirectory, string.Empty).Replace("\\", "/").TrimEnd('/');
-                var name = _item.Replace(Cfg.CssRoot!, string.Empty).TrimStart('/');
+                var _item = Path.GetRelativePath(webRootPath, item.Path).Replace('\\', '/').TrimEnd('/');
+                var name = _item.Replace(Cfg.CssRoot!.Replace('\\', '/').TrimStart('/'), string.Empty).TrimStart('/');
 
                 if (item.Depth == 1)
                 {
@@ -64,94 +57,85 @@ namespace LayerZero.Tools.Web.Bundles
                     if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.TopDirectoryOnly, [".css"]))
                         continue;
 
-                    _bundles.RegisterCssBundle(name);
+                    bundles.RegisterCssBundle(name);
                     builder.RegisterBundle($"/bundles/{name}{extension}css", [$"{_item}/*.css"], BundleType.Css, Cfg.IsMinified);
                 }
                 else
                 {
                     if (SpindleTreeGuard.IsDirectoryEmpty(item.Path, SearchOption.AllDirectories, [".css"]))
                         continue;
-                    _bundles.RegisterCssBundle(name);
+                    bundles.RegisterCssBundle(name);
                     builder.RegisterBundle($"/bundles/{name}{extension}css", [$"{_item.Replace("\\", "/")}/**/*.css"], BundleType.Css, Cfg.IsMinified);
                 }
             }
 
-            var rootFolderCssCritical = GenerateFullPath(rootDirectory, Cfg.CriticalCssRoot);
+            var rootFolderCssCritical = GenerateFullPath(webRootPath, Cfg.CriticalCssRoot);
             if (rootFolderCssCritical != null && SpindleTree.GetAllFilesPath(rootFolderCssCritical, FileExtensions: [".css"])?.Count > 0)
             {
-                _bundles.SetIsCriticalCssAvailable(true);
+                bundles.SetIsCriticalCssAvailable(true);
                 builder.RegisterBundle($"/bundles/z-Critical{extension}css",
                     [$"{Cfg.CriticalCssRoot!.Replace("\\", "/")}/**/*.css"], BundleType.Css, Cfg.IsMinified);
             }
 
-            var rootFolderJsCritical = GenerateFullPath(rootDirectory, Cfg.CriticalJsRoot);
+            var rootFolderJsCritical = GenerateFullPath(webRootPath, Cfg.CriticalJsRoot);
             if (rootFolderJsCritical != null && SpindleTree.GetAllFilesPath(rootFolderJsCritical, FileExtensions: [".js"])?.Count > 0)
             {
-                _bundles.SetIsCriticalJsAvailable(true);
+                bundles.SetIsCriticalJsAvailable(true);
                 builder.RegisterBundle($"/bundles/z-Critical{extension}js",
                     [$"{Cfg.CriticalJsRoot!.Replace("\\", "/")}/**/*.js"], BundleType.Js, Cfg.IsMinified);
             }
 
-
-            if (SpindleTree.GetAllFilesPath(GenerateFullPath(rootDirectory,Cfg.CommonCssRoot), FileExtensions: [".css"])?.Count > 0)
+            if (SpindleTree.GetAllFilesPath(GenerateFullPath(webRootPath, Cfg.CommonCssRoot), FileExtensions: [".css"])?.Count > 0)
             {
-                _bundles.SetIsCommonCssAvailable(true);
+                bundles.SetIsCommonCssAvailable(true);
                 builder.RegisterBundle($"/bundles/z-Shared{extension}css", [$"{Cfg.CommonCssRoot!.Replace("\\", "/")}/**/*.css"], BundleType.Css, Cfg.IsMinified);
             }
 
-
-            if (SpindleTree.GetAllFilesPath(GenerateFullPath(rootDirectory,Cfg.CommonJsRoot), FileExtensions: [".js"])?.Count > 0)
+            if (SpindleTree.GetAllFilesPath(GenerateFullPath(webRootPath, Cfg.CommonJsRoot), FileExtensions: [".js"])?.Count > 0)
             {
-                _bundles.SetIsCommonJsAvailable(true);
+                bundles.SetIsCommonJsAvailable(true);
                 builder.RegisterBundle($"/bundles/z-Shared{extension}js", [$"{Cfg.CommonJsRoot!.Replace("\\", "/")}/**/*.js"], BundleType.Js, Cfg.IsMinified);
             }
 
         }
 
-        private static string? GenerateFullPath(string Root, string? relative)
+        private static string? GenerateFullPath(string webRootPath, string? relative)
         {
             if (string.IsNullOrEmpty(relative))
                 return null;
-            var path = $"{Root}{relative}";
+            var path = Path.Combine(webRootPath, relative);
             return Directory.Exists(path) ? path : null;
         }
 
 
-        public static void RegisterBulk(IBundleBuilder builder, BundleCollectionConfig Cfg)
+        public static void RegisterBulk(IBundleBuilder builder, BundleCollection bundles, BundleCollectionConfig Cfg, string webRootPath)
         {
-
-            _bundles.SetBulkMode(true);
+            bundles.SetBulkMode(true);
             var extension = Cfg.IsEnvironmentDev ? ".dev." : Cfg.IsMinified ? ".min." : ".";
-            var rootDirectory = @"wwwroot/";
-
 
             List<string> cssAssets = new List<string>();
 
-            if (!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CssRoot)))
+            if (!string.IsNullOrEmpty(GenerateFullPath(webRootPath, Cfg.CssRoot)))
                 cssAssets.Add($"{Cfg.CssRoot!.Replace("\\", "/")}/**/*.css");
 
-            if (!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CriticalCssRoot)))
+            if (!string.IsNullOrEmpty(GenerateFullPath(webRootPath, Cfg.CriticalCssRoot)))
                 cssAssets.Add($"{Cfg.CriticalCssRoot!.Replace("\\", "/")}/**/*.css");
 
-            if (!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CommonCssRoot)))
+            if (!string.IsNullOrEmpty(GenerateFullPath(webRootPath, Cfg.CommonCssRoot)))
                 cssAssets.Add($"{Cfg.CommonCssRoot!.Replace("\\", "/")}/**/*.css");
-
 
             if (cssAssets.Any())
                 builder.RegisterBundle($"/bundles/bulk{extension}css", cssAssets.ToArray(), BundleType.Css, Cfg.IsMinified);
 
-
             List<string> jsAssets = new List<string>();
 
-
-            var jsAssetsPath = GenerateFullPath(rootDirectory, Cfg.JsRoot);
-            if (jsAssetsPath != null)
+            if (GenerateFullPath(webRootPath, Cfg.JsRoot) != null)
                 jsAssets.Add($"{Cfg.JsRoot!.Replace("\\", "/")}/**/*.js");
 
-            if (!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CriticalJsRoot)))
+            if (!string.IsNullOrEmpty(GenerateFullPath(webRootPath, Cfg.CriticalJsRoot)))
                 jsAssets.Add($"{Cfg.CriticalJsRoot!.Replace("\\", "/")}/**/*.js");
 
-            if (!string.IsNullOrEmpty(GenerateFullPath(rootDirectory, Cfg.CommonJsRoot)))
+            if (!string.IsNullOrEmpty(GenerateFullPath(webRootPath, Cfg.CommonJsRoot)))
                 jsAssets.Add($"{Cfg.CommonJsRoot!.Replace("\\", "/")}/**/*.js");
 
             if (jsAssets.Any())

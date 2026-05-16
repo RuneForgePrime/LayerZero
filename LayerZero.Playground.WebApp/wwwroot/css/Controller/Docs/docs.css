@@ -253,6 +253,7 @@ code {
     font-family: 'Cascadia Code', 'Consolas', monospace;
     font-size: 0.84rem;
     line-height: 1.8;
+    white-space: pre;
 }
 
 .folder-tree .ft-dir  { color: #89b4fa; }
